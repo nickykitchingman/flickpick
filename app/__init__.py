@@ -24,7 +24,9 @@ import logging
 import logging.config
 import logging.handlers
 
-logging.config.fileConfig('log/logging.conf')
+from os import path
+log_file_path = path.join(path.dirname(path.abspath(__file__)), '../log/logging.conf')
+logging.config.fileConfig(log_file_path)
 logging._srcfile = False
 logging.logThreads = False
 logging.logProcesses = False
