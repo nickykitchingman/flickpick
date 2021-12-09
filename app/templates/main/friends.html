@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+{% block nav_friends %}active{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <!-- Title -->
+            <div class="row m-5">
+                <div class="col-xs-3">
+                    <h1>{{ title }}</h1>
+                </div>
+                <div class="col-3"></div>
+            </div>
+
+            <!-- Friends container -->
+            <div class="row m-3">
+                <div class="col-10 m-3 p-1 border">
+                    <div class="col-12">
+                        <div class="row p-4">
+                            <!-- Friend list -->
+                            <ul class="col-11 list-unstyled">
+                                {% for friend in friend_list %}
+                                <div class="friend">
+                                    <li class="row m-2">
+                                        <div class="col-md-10 border">
+                                            <p>{{friend.forename}} {{friend.surname}}</p>
+                                        </div>
+                                    </li>
+                                    <!-- Match on hover -->
+                                    <div class="row hiddenpanel d-none">
+                                        <div class="col-1"></div>
+                                        <a class="col-md-8 btn btn-primary" href="#">Match</a>
+                                        <div class="col-md-1"></div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Request Title -->
+            <div class="row m-5">
+                <div class="col-xs-3">
+                    <h1>Requests</h1>
+                </div>
+                <div class="col-3"></div>
+            </div>
+
+            <!-- Requests container -->
+            <div class="row m-3">
+                <div class="col-10 m-3 p-1 border">
+                    <div class="col-12">
+                        <!-- Search box -->
+                        <div class="row p-4">
+                            <!-- Add friend button -->
+                            <a><type="button" class="btn btn-primary" id="add_friend">Add Friend</a>
+                            <!-- Search friend box -->
+                            <div class="input-group mb-3">
+                                <input id="search_friend" class="form-control d-none" type="text"
+                                    placeholder="Friend's name">
+                                <!-- Cancel (including text for screen readers) -->
+                                <a id="search_friend_cancel" class="input-group-append d-none" aria-label="Close">
+                                    <span class="input-group-text close danger" aria-hidden="true">&times;</span>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <!-- Suggestions list -->
+                            <ul id="friend_suggestions" class="col-11 list-unstyled">
+                                
+                            </ul>
+                        </div>
+                        <div class="row p-4">
+                            <!-- Request list -->
+                            <ul class="col-11 list-unstyled">
+                                <p>request 1</p>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Matches -->
+        <div class="col-6">
+            {% include "main/matches.html"  %}
+        </div>
+    </div>
+</div>
+{% endblock %}

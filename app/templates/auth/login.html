@@ -1,0 +1,41 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+
+    <h1 class="m-5">Login</h1>
+
+    <form action="" method="post" name="login">
+        {{ form.hidden_tag() }}
+
+        <!-- Username -->
+        <label>Username</label>
+        <p>{{ form.username (placeholder="Username", class_="form-control") }}</p>
+        {% for error in form.username.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Password -->
+        <label>Password</label>
+        <p>{{ form.password (placeholder="Password", class_="form-control") }}</p>
+        {% for error in form.password.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Errors -->
+        {% for error in form.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Cancel / Submit -->
+        <p>
+            <a href="{{ url_for('auth.register') }}">
+                <input type="button" class="btn btn-secondary" value="Sign Up">
+            </a>
+            <input type="submit" class="btn btn-primary" value="Login">
+        </p>
+    </form>
+</div>
+{% endblock %}

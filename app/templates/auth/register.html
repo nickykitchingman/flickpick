@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+
+    <h1 class="m-5">Register</h1>
+
+    <form action="" method="post" name="register">
+        {{ form.hidden_tag() }}
+
+        <!-- Forename -->
+        <label>First Name</label>
+        <p>{{ form.forename (placeholder="First Name", class_="form-control") }}</p>
+        {% for error in form.forename.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+
+        <!-- Surname -->
+        <label>Surname</label>
+        <p>{{ form.surname (placeholder="Surname", class_="form-control") }}</p>
+        {% for error in form.surname.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Username -->
+        <label>Username</label>
+        <p>{{ form.username (placeholder="Username", class_="form-control") }}</p>
+        {% for error in form.username.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Password -->
+        <label>Password</label>
+        <p>{{ form.password (placeholder="Password", class_="form-control") }}</p>
+        {% for error in form.password.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Confirm Password -->
+        <label>Confirm Password</label>
+        <p>{{ form.confirm_password (placeholder="Password", class_="form-control") }}</p>
+        {% for error in form.confirm_password.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Birthday -->
+        <label>Birthday</label>
+        <p>{{ form.birthday (placeholder="dd/mm/yyyy", class_="form-control", id="datepicker") }}</p>
+        {% for error in form.birthday.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Email -->
+        <label>Email</label>
+        <p>{{ form.email (placeholder="example@mail.com", class_="form-control") }}</p>
+        {% for error in form.email.errors %}
+        <div class="alert alert-danger" role="alert">*{{ error }}</div>
+        {% endfor %}
+        </p>
+
+        <!-- Cancel / Submit -->
+        <p>
+            <a href="{{ url_for('auth.login') }}">
+                <input type="button" class="btn btn-secondary" value="Log In">
+            </a>
+            <input type="submit" class="btn btn-primary" value="Register">
+        </p>
+    </form>
+</div>
+{% endblock %}
