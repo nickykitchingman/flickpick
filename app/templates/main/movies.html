@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% block nav_movies %}active{% endblock %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-6">
+            <!-- Title -->
+            <div class="row m-5">
+                <div class="col-xs-3">
+                    <h1>{{ title }}</h1>
+                </div>
+                <div class="col-3"></div>
+            </div>
+
+            <!-- Movies container -->
+            <div class="row m-3">
+                <div class="col-10 m-3 p-1 border">
+                    <div class="col-12">
+                        <div class="row p-4">
+                            <!-- Movie list -->
+                            <ul class="col-11 list-unstyled">
+                                {% for movie in movie_list %}
+                                <li class="row m-2">
+                                    <div class="col-md-10 border">
+                                        <p>{{movie.name}} ({{movie.releasedate.year}})</p>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

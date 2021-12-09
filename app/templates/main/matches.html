@@ -1,0 +1,31 @@
+<!-- Heading -->
+<div class="row m-5">
+    <div class="col-3"></div>
+    <div class="col-xs-3">
+        <h2>Matches</h2>
+    </div>
+</div>
+
+<!-- Matches container -->
+<div class="row m-3">
+    <div class="col-12 m-3 p-1 border">
+        <div class="row">
+            <div class="col-12">
+                <div class="row p-4">
+                    <!-- Matches list -->
+                    <ul class="col-11 list-unstyled">
+                        {% if movies %}{% for movie in matches %}
+                        <div>
+                            <li class="row m-2">
+                                <div class="col-md-12 border">
+                                    <p>{{movie.name}}</p>
+                                </div>
+                            </li>
+                        </div>
+                        {% endfor %}{% endif %}
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

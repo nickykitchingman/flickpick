@@ -1,0 +1,16 @@
+# database
+*.db
+migrations/
+
+# unit tests
+tests/
+
+# cache
+__pycache__/
+tmp/
+
+# vscode
+.vscode/
+
+# logs
+*.log*
