@@ -20,7 +20,7 @@
   </div>
 
   <!-- Sign up / Login -->
-  {% if not signed_in %}
+  {% if not g.user %}
   <p>
     <a href="{{ url_for('auth.login') }}">
       <input type="button" class="btn btn-secondary" value="Log In">

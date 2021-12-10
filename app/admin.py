@@ -38,7 +38,10 @@ class MyModelView(ModelView):
 
 # Admin front end
 adminView = Admin(app, template_mode="bootstrap3", index_view=MyAdminIndexView())
+
 adminView.add_link(MenuLink(name='Main Site', url='/'))
+adminView.add_link(MenuLink(name='Logout', url='/auth/logout'))
+
 adminView.add_view(MyModelView(User, db.session))
 adminView.add_view(MyModelView(Movie, db.session))
 adminView.add_view(MyModelView(StreamSite, db.session))

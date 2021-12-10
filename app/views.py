@@ -24,8 +24,7 @@ def index():
 
         return render_template("index.html", 
                 title="Home",
-                user=g.user,
-                signed_in=signed_in)
+                user=g.user)
 
 @bp.route('/friends')
 @login_required
@@ -38,7 +37,6 @@ def friends():
         return render_template("main/friends.html", 
                 title="Friends",
                 user=g.user,
-                signed_in=True,
                 friend_list=g.user.friends)
 
 @bp.route('/users_like', methods=['POST'])
@@ -71,7 +69,6 @@ def groups():
         return render_template("main/groups.html", 
                 title="Groups",
                 user=g.user,
-                signed_in=True,
                 group_list=g.user.groups)
 
 @bp.route('/matcher')
@@ -87,7 +84,6 @@ def matcher():
         return render_template("main/movie_match.html", 
                 title="Movie Matcher",
                 user=g.user,
-                signed_in=True,
                 movie=movie)
 
 @bp.route('/movies')
@@ -101,5 +97,4 @@ def movies():
         return render_template("main/movies.html", 
                 title="Your Movies",
                 user=g.user,
-                signed_in=True,
                 movie_list=g.user.movies)
