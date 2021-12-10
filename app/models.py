@@ -4,7 +4,8 @@ from flask_security import UserMixin, RoleMixin
 
 movie_choice = db.Table('movie_choice', db.Model.metadata,
     db.Column('userId', db.Integer, db.ForeignKey('user.userId')),
-    db.Column('movieId', db.Integer, db.ForeignKey('movie.movieId'))
+    db.Column('movieId', db.Integer, db.ForeignKey('movie.movieId')),
+    db.Column('strength', db.Integer, index=True)
 )
 
 stream = db.Table('stream', db.Model.metadata,
