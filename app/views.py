@@ -21,13 +21,10 @@ bp = Blueprint('app', __name__)
 def index():
         # Customise index if signed in
         signed_in = g.user is not None
-        name = None
-        if signed_in:
-                name = g.user.forename
 
         return render_template("index.html", 
                 title="Home",
-                name=name,
+                user=g.user,
                 signed_in=signed_in)
 
 @bp.route('/friends')
@@ -40,9 +37,9 @@ def friends():
 
         return render_template("main/friends.html", 
                 title="Friends",
+                user=g.user,
                 signed_in=True,
                 friend_list=g.user.friends)
-                #matches=matches)
 
 @bp.route('/users_like', methods=['POST'])
 @login_required
@@ -73,6 +70,7 @@ def groups():
 
         return render_template("main/groups.html", 
                 title="Groups",
+                user=g.user,
                 signed_in=True,
                 group_list=g.user.groups)
 
@@ -88,6 +86,7 @@ def matcher():
 
         return render_template("main/movie_match.html", 
                 title="Movie Matcher",
+                user=g.user,
                 signed_in=True,
                 movie=movie)
 
@@ -101,5 +100,6 @@ def movies():
 
         return render_template("main/movies.html", 
                 title="Your Movies",
+                user=g.user,
                 signed_in=True,
                 movie_list=g.user.movies)

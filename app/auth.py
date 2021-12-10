@@ -42,7 +42,7 @@ def admin_required(view):
             accessLogger.info('User attempted to access admin page whilst not logged in - returned to auth.login')
             return redirect(url_for('auth.login'))
 
-        if not g.user.hasRole('superuser'):
+        if not g.user.has_role('superuser'):
             accessLogger.info('User attempted to access admin page whilst admin - returned to auth.login')
             return redirect(url_for('auth.login'))
 
@@ -68,6 +68,7 @@ def register():
                             password=generate_password_hash(form.password.data),
                             birthday=form.birthday.data,
                             email=form.email.data)
+                    u.add_role('user')
 
                     # Add new user to database
                     db.session.add(u)
@@ -110,7 +111,7 @@ def logout():
     userId = session.get('user_id')
     if userId is None:
         accessLogger.error(f'Logout NO ID')
-    accessLogger.info(f'Logout (id:{userId}')
+    accessLogger.info(f'Logout (id:{userId})')
 
     # Clean and return to index
     session.clear()

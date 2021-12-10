@@ -60,8 +60,18 @@ class User(db.Model, UserMixin):
     def set_password(self, password):
         self.password = generate_password_hash(password)
 
+    # Simpler role interface
     def has_role(self, role):
-        return role in self.roles
+        return role in [role.name for role in self.roles]
+    def add_role(self, role):
+        role_object = Role.query.filter_by(name=role).first()
+        if role_object is None:
+            errorLogger.error(f'Attempted to add role ({role}) that does not exist')
+            return
+
+        # Add role if exists and is not already assigned 
+        if role_object not in self.roles:
+            self.roles.append(role_object)
 
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
@@ -75,7 +85,7 @@ class Role(db.Model, RoleMixin):
     description = db.Column(db.String(255))
 
     def __repr__(self):
-        return self.name
+        return f"{self.name}: {self.description}"
 
 class Movie(db.Model):
     movieId = db.Column(db.Integer, primary_key=True)

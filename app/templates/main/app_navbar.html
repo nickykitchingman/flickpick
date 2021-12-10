@@ -6,5 +6,8 @@
 </ul>
 
 <ul class="nav navbar-nav navbar-right">
+  {% if user and user.has_role('superuser') %}
+  <li><a class="btn btn-dark mr-2" href="{{ url_for('admin.index') }}">Admin Site</a></li>
+  {% endif %}
   <li><a class="btn btn-info" href="{{ url_for('auth.logout') }}">Log Out</a></li>
 </ul>

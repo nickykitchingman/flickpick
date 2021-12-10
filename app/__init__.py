@@ -10,14 +10,12 @@ Created on Mon Sep 27 14:05:22 2021
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-from flask_admin import Admin
 
 app = Flask(__name__)
 app.config.from_object('config')
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db, render_as_batch=True)
-adminView = Admin(app, template_mode="bootstrap3")
 
 # Logging
 import logging
@@ -35,8 +33,8 @@ accessLogger = logging.getLogger('access')
 errorLogger = logging.getLogger('warning')
 criticalLogger = logging.getLogger('critical')
 
-# Models & views (including auth, admin views)
-from app import views, models, auth, admin
+# Models & views (including auth views)
+from app import views, models, auth
 
 app.register_blueprint(auth.bp)
 app.register_blueprint(views.bp)
