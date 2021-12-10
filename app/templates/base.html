@@ -45,7 +45,7 @@
     </button>
 
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
-      {% if user_level and user_level == 1 %}{% include "main/app_navbar.html" %}{% endif %}
+      {% if signed_in %}{% include "main/app_navbar.html" %}{% endif %}
     </div>
   </nav>
 

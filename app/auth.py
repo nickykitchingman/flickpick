@@ -35,6 +35,21 @@ def login_required(view):
 
     return wrapped_view
 
+def admin_required(view):
+    @functools.wraps(view)
+    def wrapped_view(**kwargs):
+        if g.user is None:
+            accessLogger.info('User attempted to access admin page whilst not logged in - returned to auth.login')
+            return redirect(url_for('auth.login'))
+
+        if not g.user.hasRole('superuser'):
+            accessLogger.info('User attempted to access admin page whilst admin - returned to auth.login')
+            return redirect(url_for('auth.login'))
+
+        return view(**kwargs)
+
+    return wrapped_view
+
 @bp.route('/register', methods=['GET', 'POST'])
 def register():        
         form = RegisterForm()

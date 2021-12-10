@@ -7,7 +7,7 @@
     <div class="col-xs-1">
       <img class="img-responsive" height="100px" src="static/logo.png" alt="Logo">
     </div>
-    <h1 class="col-3 mt-3">Welcome back!</h1>
+    <h1 class="col-3 mt-3">Welcome back{%if name%} {{name}}{%endif%}!</h1>
   </div>
 
   <!-- Welcome text -->
@@ -20,7 +20,7 @@
   </div>
 
   <!-- Sign up / Login -->
-  {% if not user_level or user_level == 0 %}
+  {% if not signed_in %}
   <p>
     <a href="{{ url_for('auth.login') }}">
       <input type="button" class="btn btn-secondary" value="Log In">

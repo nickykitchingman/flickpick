@@ -17,7 +17,7 @@ app.config.from_object('config')
 db = SQLAlchemy(app)
 
 migrate = Migrate(app, db, render_as_batch=True)
-admin = Admin(app, template_mode="bootstrap3")
+adminView = Admin(app, template_mode="bootstrap3")
 
 # Logging
 import logging
@@ -35,8 +35,8 @@ accessLogger = logging.getLogger('access')
 errorLogger = logging.getLogger('warning')
 criticalLogger = logging.getLogger('critical')
 
-# Models & views (including auth views)
-from app import views, models, auth
+# Models & views (including auth, admin views)
+from app import views, models, auth, admin
 
 app.register_blueprint(auth.bp)
 app.register_blueprint(views.bp)
