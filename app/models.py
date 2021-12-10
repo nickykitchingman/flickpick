@@ -46,7 +46,6 @@ class User(db.Model):
 
     # Relationships
     friends = db.relationship('User', secondary=friendship,
-        backref='user',
         primaryjoin=userId==friendship.c.userId,
         secondaryjoin=userId==friendship.c.friendId)
     movies = db.relationship('Movie', secondary=movie_choice,
