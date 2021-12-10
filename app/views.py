@@ -53,7 +53,9 @@ def users_like():
         traceLogger.debug(f'User ({g.user.userId}) requested to find users_like %{username}%')
 
         # Get users with similar username
-        users = User.query.filter(User.username.like(f'%{username}%'), User.userId!=g.user.userId).limit(5).all()
+        users = User.query.filter(User.username.like(f'%{username}%'),
+                User.userId!=g.user.userId,
+                User.roles.any(name='user')).limit(5).all()
         user_dicts = [user.as_dict() for user in users]
 
         return jsonify(user_dicts)
