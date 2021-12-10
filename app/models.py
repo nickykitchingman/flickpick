@@ -1,4 +1,4 @@
-from app import db
+from app import db, errorLogger
 from werkzeug.security import generate_password_hash
 from flask_security import UserMixin, RoleMixin
 
