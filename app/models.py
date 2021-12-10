@@ -34,7 +34,7 @@ user_role = db.Table(
     db.Column('role_id', db.Integer, db.ForeignKey('role.roleId'))
 )
 
-class User(db.Model, UserMixin):
+class User(db.Model):
     userId = db.Column(db.Integer, primary_key=True)
     forename = db.Column(db.String(40))
     surname = db.Column(db.String(40))
@@ -79,7 +79,7 @@ class User(db.Model, UserMixin):
     def __repr__(self):
             return '{}{}{}{}{}{}{}'.format(self.userId, self.forename, self.surname, self.username, self.password, self.birthday, self.email)
 
-class Role(db.Model, RoleMixin):
+class Role(db.Model):
     roleId = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(80), unique=True)
     description = db.Column(db.String(255))

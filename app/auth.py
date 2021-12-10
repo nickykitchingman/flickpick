@@ -89,6 +89,9 @@ def login():
         # Retrieve user
         user = User.query.filter_by(username=form.username.data).first()
 
+        # Clear errors
+        form.errors.clear()
+
         # Username or password incorrect - not disclosing which
         if user is None or not check_password_hash(user.password, form.password.data):
             accessLogger.warning(f'Login FAIL (username:{form.username.data})')
