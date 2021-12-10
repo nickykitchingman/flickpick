@@ -29,6 +29,13 @@ friendship = db.Table('friend', db.Model.metadata,
     db.UniqueConstraint('userId', 'friendId', name='unique_friendships')
 )
 
+request = db.Table('request', db.Model.metadata,
+    db.Column('userId', db.Integer, db.ForeignKey('user.userId'), index=True),
+    db.Column('friendId', db.Integer, db.ForeignKey('user.userId')),
+    db.Column('date', db.DateTime),
+    db.UniqueConstraint('userId', 'friendId', name='unique_requests')
+)
+
 user_role = db.Table(
     'user_role',
     db.Column('user_id', db.Integer, db.ForeignKey('user.userId')),
