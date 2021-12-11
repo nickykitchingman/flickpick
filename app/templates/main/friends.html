@@ -69,14 +69,20 @@
                         <div class="row">
                             <!-- Suggestions list -->
                             <ul id="friend_suggestions" class="col-11 list-unstyled">
-                                
+                                <!-- Suggestions will be put here using jquery in requests.js -->
                             </ul>
                         </div>
                         <div class="row p-4">
                             <!-- Request list -->
-                            <ul class="col-11 list-unstyled">
-                                <p>request 1</p>
-                            </ul>
+                            {% for request in requests %}
+                            <div class='col-12'>
+                                <li class="row m-2">
+                                    <div class="col-md-12 border">
+                                        <p>{{request['friendId'].forename}} {{request['friendId'].surname}}</p>
+                                    </div>
+                                </li>
+                            </div>
+                            {% endfor %}
                         </div>
                     </div>
                 </div>

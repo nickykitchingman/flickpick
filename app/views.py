@@ -9,7 +9,7 @@ Created on Mon Sep 27 14:07:20 2021
 from flask import Blueprint, render_template, flash, redirect, g, request, url_for, session, jsonify
 from app import app, db, models, admin, errorLogger, traceLogger
 from .forms import RegisterForm
-from .models import User, Movie, StreamSite, Group
+from .models import User, Movie, StreamSite, Group, request
 import json
 
 from werkzeug.exceptions import abort
@@ -34,10 +34,16 @@ def friends():
                 errorLogger.error('Failed to load movies - no user_id in session')
                 abort(401)
 
+        # Get friend requests
+        requests = db.session.query(request.c.friendId, request.c.date).filter(request.c.userId==g.user.userId).all()
+        requests_list = [{'friendId': User.query.get(req.friendId), 'data':req.date} for req in requests]
+        traceLogger.debug(requests)        
+
         return render_template("main/friends.html", 
                 title="Friends",
                 user=g.user,
-                friend_list=g.user.friends)
+                friend_list=g.user.friends,
+                requests=requests_list)
 
 @bp.route('/users_like', methods=['POST'])
 @login_required
@@ -59,6 +65,31 @@ def users_like():
         user_dicts = [user.as_dict() for user in users]
 
         return jsonify(user_dicts)
+
+@bp.route('/friend_request', methods=['POST'])
+@login_required
+def friend_request():
+        # Not logged in
+        if g.user == None:
+                errorLogger.error('Unauthorised friend_request - not logged in')
+                abort(403)
+
+        # Load JSON data
+        data = json.loads(request.data)
+        user_id = data.get('userId')
+
+        # Check user exists
+        friend = User.query.get(user_id)
+        if friend is None:
+                errorLogger.error('friend_request failed - could not find user')
+                abort(404)
+
+        # Send friend request
+        traceLogger.debug(f'User ({g.user.userId}) sending request to {friend.username}')
+        friend.requests.append(g.user)
+        db.session.commit()
+
+        return json.dumps({'status':'OK'})
 
 @bp.route('/groups')
 @login_required

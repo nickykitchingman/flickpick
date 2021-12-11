@@ -1,6 +1,7 @@
 from app import db, errorLogger
 from werkzeug.security import generate_password_hash
 from flask_security import UserMixin, RoleMixin
+from datetime import datetime
 
 movie_choice = db.Table('movie_choice', db.Model.metadata,
     db.Column('userId', db.Integer, db.ForeignKey('user.userId')),
@@ -32,7 +33,7 @@ friendship = db.Table('friend', db.Model.metadata,
 request = db.Table('request', db.Model.metadata,
     db.Column('userId', db.Integer, db.ForeignKey('user.userId'), index=True),
     db.Column('friendId', db.Integer, db.ForeignKey('user.userId')),
-    db.Column('date', db.DateTime),
+    db.Column('date', db.DateTime, nullable=False, default=datetime.now()),
     db.UniqueConstraint('userId', 'friendId', name='unique_requests')
 )
 
@@ -55,6 +56,9 @@ class User(db.Model):
     friends = db.relationship('User', secondary=friendship,
         primaryjoin=userId==friendship.c.userId,
         secondaryjoin=userId==friendship.c.friendId)
+    requests = db.relationship('User', secondary=request,
+        primaryjoin=userId==request.c.userId,
+        secondaryjoin=userId==request.c.friendId)
     movies = db.relationship('Movie', secondary=movie_choice,
         backref=db.backref('user', lazy='joined'))
     streamSites = db.relationship("StreamSite", secondary=user_site,
@@ -79,6 +83,7 @@ class User(db.Model):
         # Add role if exists and is not already assigned 
         if role_object not in self.roles:
             self.roles.append(role_object)
+            db.session.commit()
 
     def as_dict(self):
        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
