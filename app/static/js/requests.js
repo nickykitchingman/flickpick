@@ -19,6 +19,7 @@ $(document).ready(function () {
 
 		if (username == "") {
 			$("#friend_suggestions").empty();
+			friend_suggestions.length = 0;
 		}
 		else {
 			$.ajax({
@@ -27,18 +28,22 @@ $(document).ready(function () {
 				data: JSON.stringify({ username: username }),
 				contentType: "application/json; charset=utf-8",
 				datatype: "json",
+
 				success: function (response) {
-					$('#friend_suggestions').empty();
-					friend_suggestions.length = 0;
-					// Autocomplete suggestions for usernames
-					var i = 0;
-					response.forEach(function (user) {
-						suggestion = user['username']
-						friend_suggestions.push(user);
-						$('#friend_suggestions').append('<li><a id="suggestion' + i + 
-							'" class="suggestion btn btn-secondary">' + suggestion + '</a></li>')
-						i++;
-					});
+					var username = $("#search_friend").val();
+					if (username != "") {
+						// Autocomplete suggestions for usernames
+						$('#friend_suggestions').empty();
+						friend_suggestions.length = 0;
+						var i = 0;
+						response.forEach(function (user) {
+							suggestion = user['username']
+							friend_suggestions.push(user);
+							$('#friend_suggestions').append('<li><a id="suggestion' + i +
+								'" class="suggestion btn btn-secondary">' + suggestion + '</a></li>')
+							i++;
+						});
+					}
 				},
 				error: function (error) {
 					console.log("Error " + error);
@@ -48,9 +53,9 @@ $(document).ready(function () {
 	});
 
 	// Send friend request
-	$(document).on('click', '.suggestion', function() {
+	$(document).on('click', '.suggestion', function () {
 		console.log("click");
-		var friendId = 	parseInt($(this).attr('id').replace('suggestion',''));
+		var friendId = parseInt($(this).attr('id').replace('suggestion', ''));
 		console.log(friendId);
 		var user = friend_suggestions[friendId];
 
@@ -60,11 +65,11 @@ $(document).ready(function () {
 			data: JSON.stringify({ userId: user.userId }),
 			contentType: 'application/json; charset=utf-8',
 			datatype: 'json',
-			success: function(response) {
-				console.log("Success.");
-				$(this).hide();
+
+			success: function (response) {
+				$('#suggestion' + friendId).hide();
 			},
-			error: function(error) {
+			error: function (error) {
 				console.log('Error: ' + error);
 			}
 		});
