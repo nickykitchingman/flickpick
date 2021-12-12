@@ -23,13 +23,15 @@
                                 <div class="friend">
                                     <li class="row m-2">
                                         <div class="col-md-10 border">
-                                            <p>{{friend.forename}} {{friend.surname}}</p>
+                                            <p>{{friend.forename}}
+                                                {{friend.surname}}</p>
                                         </div>
                                     </li>
                                     <!-- Match on hover -->
                                     <div class="row hiddenpanel d-none">
                                         <div class="col-1"></div>
-                                        <a class="col-md-8 btn btn-primary" href="#">Match</a>
+                                        <a class="col-md-8 btn btn-primary"
+                                            href="#">Match</a>
                                         <div class="col-md-1"></div>
                                     </div>
                                 </div>
@@ -55,44 +57,52 @@
                         <!-- Search box -->
                         <div class="row p-4">
                             <!-- Add friend button -->
-                            <a><type="button" class="btn btn-primary" id="add_friend">Add Friend</a>
-                            <!-- Search friend box -->
-                            <div class="input-group mb-3">
-                                <input id="search_friend" class="form-control d-none" type="text"
-                                    placeholder="Friend's name">
-                                <!-- Cancel (including text for screen readers) -->
-                                <a id="search_friend_cancel" class="input-group-append d-none" aria-label="Close">
-                                    <span class="input-group-text close danger" aria-hidden="true">&times;</span>
-                                </a>
+                            <a><type="button" class="btn btn-primary"
+                                    id="add_friend">Add Friend</a>
+                                <!-- Search friend box -->
+                                <div class="input-group mb-3">
+                                    <input id="search_friend"
+                                        class="form-control d-none" type="text"
+                                        placeholder="Friend's name">
+                                    <!-- Cancel (including text for screen readers) -->
+                                    <a id="search_friend_cancel"
+                                        class="input-group-append d-none"
+                                        aria-label="Close">
+                                        <span class="input-group-text close
+                                            danger" aria-hidden="true">&times;</span>
+                                    </a>
+                                </div>
                             </div>
-                        </div>
-                        <div class="row">
-                            <!-- Suggestions list -->
-                            <ul id="friend_suggestions" class="col-11 list-unstyled">
-                                <!-- Suggestions will be put here using jquery in requests.js -->
-                            </ul>
-                        </div>
-                        <div class="row p-4">
-                            <!-- Request list -->
-                            {% for request in requests %}
-                            <div class='col-12'>
-                                <li class="row m-2">
-                                    <div class="col-md-12 border">
-                                        <p>{{request['friendId'].forename}} {{request['friendId'].surname}}</p>
-                                    </div>
+                            <div class="row">
+                                <!-- Suggestions list -->
+                                <ul id="friend_suggestions" class="col-11
+                                    list-unstyled">
+                                    <!-- Suggestions will be put here using jquery in requests.js -->
+                                </ul>
+                            </div>
+                            <ul class="row p-4 list-unstyled">
+                                <!-- Request list -->
+                                {% for request in requests %}
+                                <li id="request{{request['friend'].userId}}"
+                                    class='col-md-12 border'>
+                                    <div class="btn">{{request['friend'].forename}}
+                                        {{request['friend'].surname}}</div>
+                                    <div class="accept btn btn-primary
+                                        float-right rounded-0">Accept</div>
+                                    <div class="decline btn btn-danger
+                                        float-right rounded-0">Decline</div>
                                 </li>
-                            </div>
-                            {% endfor %}
+                                {% endfor %}
+                            </ul>
                         </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Matches -->
-        <div class="col-6">
-            {% include "main/matches.html"  %}
+            <!-- Matches -->
+            <div class="col-6">
+                {% include "main/matches.html" %}
+            </div>
         </div>
     </div>
-</div>
-{% endblock %}
+    {% endblock %}

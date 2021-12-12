@@ -49,31 +49,20 @@ def index():
 def friends():
 
     # Not logged in
-
     if g.user == None:
-
-        errorLogger.error('Failed to load movies - no user_id in session')
-
+        errorLogger.error('Failed to load friends - no user_id in session')
         abort(401)
 
     # Get friend requests
-
     requests = db.session.query(friend_request.c.friendId, friend_request.c.date).filter(
         friend_request.c.userId == g.user.userId).all()
-
-    requests_list = [{'friendId': User.query.get(
+    requests_list = [{'friend': User.query.get(
         req.friendId), 'data': req.date} for req in requests]
 
-    traceLogger.debug(requests)
-
     return render_template("main/friends.html",
-
                            title="Friends",
-
                            user=g.user,
-
                            friend_list=g.user.friends,
-
                            requests=requests_list)
 
 
@@ -129,22 +118,76 @@ def send_friend_request():
     return json.dumps({'status': 'OK'})
 
 
+@bp.route('/request_accept', methods=['POST'])
+@login_required
+def request_accept():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Unauthorised request_accept - not logged in')
+        abort(403)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    user_id = data.get('userId')
+
+    # Check user exists
+    friend = User.query.get(user_id)
+    if friend is None:
+        errorLogger.error('request_accept failed - could not find user')
+        abort(404)
+
+    # Accept friend request
+    traceLogger.debug(
+        f'User ({g.user.userId}) accepting request from ({friend.userId})')
+    if friend not in g.user.friends:
+        g.user.friends.append(friend)
+    if g.user not in friend.friends:
+        friend.friends.append(g.user)
+    if friend in g.user.requests:
+        g.user.requests.remove(friend)
+    db.session.commit()
+
+    return json.dumps({'status': 'OK'})
+
+
+@bp.route('/request_decline', methods=['POST'])
+@login_required
+def request_decline():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Unauthorised request_decline - not logged in')
+        abort(403)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    user_id = data.get('userId')
+
+    # Check user exists
+    friend = User.query.get(user_id)
+    if friend is None:
+        errorLogger.error('request_decline failed - could not find user')
+        abort(404)
+
+    # Decline friend request
+    traceLogger.debug(
+        f'User ({g.user.userId}) declining request from ({friend.userId})')
+    if friend in g.user.requests:
+        g.user.requests.remove(friend)
+    db.session.commit()
+
+    return json.dumps({'status': 'OK'})
+
+
 @bp.route('/groups')
 @login_required
 def groups():
-
     # Not logged in
-
     if g.user == None:
-
         errorLogger.error('Failed to load movies - not logged in')
-
         abort(401)
 
     return render_template("main/groups.html",
-
                            title="Groups",
-
                            user=g.user,
                            group_list=g.user.groups)
 
@@ -152,23 +195,16 @@ def groups():
 @bp.route('/matcher')
 @login_required
 def matcher():
-
     # Not logged in
-
     if g.user == None:
-
         errorLogger.error('Failed to load matcher - not logged in')
-
         abort(401)
 
     movie = {"name": "Spectre"}
 
     return render_template("main/movie_match.html",
-
                            title="Movie Matcher",
-
                            user=g.user,
-
                            movie=movie)
 
 

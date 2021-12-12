@@ -54,9 +54,7 @@ $(document).ready(function () {
 
 	// Send friend request
 	$(document).on('click', '.suggestion', function () {
-		console.log("click");
 		var friendId = parseInt($(this).attr('id').replace('suggestion', ''));
-		console.log(friendId);
 		var user = friend_suggestions[friendId];
 
 		$.ajax({
@@ -68,6 +66,46 @@ $(document).ready(function () {
 
 			success: function (response) {
 				$('#suggestion' + friendId).hide();
+			},
+			error: function (error) {
+				console.log('Error: ' + error);
+			}
+		});
+	});
+
+	// Accept friend request
+	$('.accept').click(function () {
+		userId = $(this).parent().attr('id').replace('request', '');
+
+		$.ajax({
+			url: '/request_accept',
+			type: 'POST',
+			data: JSON.stringify({ userId: userId }),
+			contentType: 'application/json; charset=utf-8',
+			datatype: 'json',
+
+			success: function (response) {
+				$('#request' + userId).hide();
+			},
+			error: function (error) {
+				console.log('Error: ' + error);
+			}
+		});
+	});
+
+	// Decline friend request
+	$('.decline').click(function () {
+		userId = $(this).parent().attr('id').replace('request', '');
+
+		$.ajax({
+			url: '/request_decline',
+			type: 'POST',
+			data: JSON.stringify({ userId: userId }),
+			contentType: 'application/json; charset=utf-8',
+			datatype: 'json',
+
+			success: function (response) {
+				$('#request' + userId).hide();
 			},
 			error: function (error) {
 				console.log('Error: ' + error);

@@ -86,85 +86,54 @@ user_role = db.Table(
 
 
 class User(db.Model):
-
     userId = db.Column(db.Integer, primary_key=True)
-
     forename = db.Column(db.String(40))
-
     surname = db.Column(db.String(40))
-
     username = db.Column(db.String(40), unique=True)
-
     password = db.Column(db.String(200))
-
     birthday = db.Column(db.Date)
-
     email = db.Column(db.String(120), unique=True)
 
     # Relationships
-
     friends = db.relationship('User', secondary=friendship,
-
                               primaryjoin=userId == friendship.c.userId,
-
                               secondaryjoin=userId == friendship.c.friendId)
-
     requests = db.relationship('User', secondary=friend_request,
-
                                primaryjoin=userId == friend_request.c.userId,
-
                                secondaryjoin=userId == friend_request.c.friendId)
-
     movies = db.relationship('Movie', secondary=movie_choice,
-
                              backref=db.backref('user', lazy='joined'))
-
     streamSites = db.relationship("StreamSite", secondary=user_site,
-
                                   backref=db.backref('user', lazy='joined'))
-
     groups = db.relationship('Group', secondary=in_group,
-
                              backref=db.backref('user', lazy='joined'))
-
     roles = db.relationship('Role', secondary=user_role,
-
                             backref=db.backref('user', lazy='dynamic'))
 
+    # Hash password instead of saving plaintext
     def set_password(self, password):
-
         self.password = generate_password_hash(password)
 
     # Simpler role interface
-
     def has_role(self, role):
-
         return role in [role.name for role in self.roles]
 
     def add_role(self, role):
-
         role_object = Role.query.filter_by(name=role).first()
-
         if role_object is None:
-
             errorLogger.error(
                 f'Attempted to add role ({role}) that does not exist')
             return
 
         # Add role if exists and is not already assigned
-
         if role_object not in self.roles:
-
             self.roles.append(role_object)
-
             db.session.commit()
 
     def as_dict(self):
-
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
 
     def __repr__(self):
-
         return '{}{}{}{}{}{}{}'.format(self.userId, self.forename, self.surname, self.username, self.password, self.birthday, self.email)
 
 
