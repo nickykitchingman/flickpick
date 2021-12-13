@@ -7,83 +7,59 @@ from datetime import datetime
 
 
 movie_choice = db.Table('movie_choice', db.Model.metadata,
-
                         db.Column('userId', db.Integer,
                                   db.ForeignKey('user.userId')),
-
                         db.Column('movieId', db.Integer,
                                   db.ForeignKey('movie.movieId')),
-
                         db.Column('strength', db.Integer, index=True)
                         )
 
-
 stream = db.Table('stream', db.Model.metadata,
-
                   db.Column('movieId', db.Integer,
                             db.ForeignKey('movie.movieId')),
-
                   db.Column('streamSiteId', db.Integer,
                             db.ForeignKey('stream_site.streamSiteId'))
                   )
 
-
 user_site = db.Table('user_site', db.Model.metadata,
-
                      db.Column('userId', db.Integer,
                                db.ForeignKey('user.userId')),
-
                      db.Column('streamSiteId', db.Integer,
                                db.ForeignKey('stream_site.streamSiteId'))
                      )
 
-
 in_group = db.Table('in_group', db.Model.metadata,
-
                     db.Column('userId', db.Integer,
                               db.ForeignKey('user.userId')),
-
                     db.Column('groupId', db.Integer,
                               db.ForeignKey('group.groupId'))
                     )
 
-
 friendship = db.Table('friend', db.Model.metadata,
-
                       db.Column('userId', db.Integer, db.ForeignKey(
                           'user.userId'), index=True),
-
                       db.Column('friendId', db.Integer,
                                 db.ForeignKey('user.userId')),
-
                       db.UniqueConstraint(
                           'userId', 'friendId', name='unique_friendships')
                       )
 
 friend_request = db.Table('request', db.Model.metadata,
-
                           db.Column('userId', db.Integer, db.ForeignKey(
                               'user.userId'), index=True),
-
                           db.Column('friendId', db.Integer,
                                     db.ForeignKey('user.userId')),
-
                           db.Column('date', db.DateTime,
                                     nullable=False, default=datetime.now()),
-
                           db.UniqueConstraint(
                               'userId', 'friendId', name='unique_requests')
                           )
 
-
 user_role = db.Table(
     'user_role',
-
     db.Column('user_id', db.Integer, db.ForeignKey('user.userId')),
-
     db.Column('role_id', db.Integer, db.ForeignKey('role.roleId'))
 )
-
 
 class User(db.Model):
     userId = db.Column(db.Integer, primary_key=True)
@@ -138,52 +114,33 @@ class User(db.Model):
 
 
 class Role(db.Model):
-
     roleId = db.Column(db.Integer, primary_key=True)
-
     name = db.Column(db.String(80), unique=True)
-
     description = db.Column(db.String(255))
 
     def __repr__(self):
-
         return f"{self.name}: {self.description}"
 
-
 class Movie(db.Model):
-
     movieId = db.Column(db.Integer, primary_key=True)
-
     name = db.Column(db.String(60))
-
     releasedate = db.Column(db.Date)
-
     streamSites = db.relationship("StreamSite", secondary=stream,
-
                                   backref=db.backref('movie', lazy='joined'))
 
     def __repr__(self):
-
         return '{}{}{}'.format(self.movieId, self.name, self.releasedate)
 
-
 class StreamSite(db.Model):
-
     streamSiteId = db.Column(db.Integer, primary_key=True)
-
     name = db.Column(db.String(60))
 
     def __repr__(self):
-
         return '{}{}'.format(self.streamSiteId, self.name)
 
-
 class Group(db.Model):
-
     groupId = db.Column(db.Integer, primary_key=True)
-
     name = db.Column(db.String(60))
 
     def __repr__(self):
-
         return '{}{}'.format(self.groupId, self.name)

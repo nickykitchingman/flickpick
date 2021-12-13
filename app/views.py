@@ -1,53 +1,33 @@
 #!/usr/bin/env python3
-
 # -*- coding: utf-8 -*-
-
 """
-
 Created on Mon Sep 27 14:07:20 2021
 
-
 @author: sc20nk
-
 """
 
-
 from flask import Blueprint, render_template, flash, redirect, g, request, url_for, session, jsonify
-
 from app import app, db, models, admin, errorLogger, traceLogger
-
 from .forms import RegisterForm
-
 from .models import User, Movie, StreamSite, Group, friend_request
-
 import json
 
-
 from werkzeug.exceptions import abort
-
 from app.auth import login_required
-
 
 bp = Blueprint('app', __name__)
 
-
 @bp.route('/')
 def index():
-
     # Customise index if signed in
-
     signed_in = g.user is not None
-
     return render_template("index.html",
-
                            title="Home",
                            user=g.user)
-
 
 @bp.route('/friends')
 @login_required
 def friends():
-
     # Not logged in
     if g.user == None:
         errorLogger.error('Failed to load friends - no user_id in session')
@@ -89,7 +69,6 @@ def users_like():
     user_dicts = [user.as_dict() for user in users]
 
     return jsonify(user_dicts)
-
 
 @bp.route('/friend_request', methods=['POST'])
 @login_required
@@ -149,7 +128,6 @@ def request_accept():
 
     return json.dumps({'status': 'OK'})
 
-
 @bp.route('/request_decline', methods=['POST'])
 @login_required
 def request_decline():
@@ -177,7 +155,6 @@ def request_decline():
 
     return json.dumps({'status': 'OK'})
 
-
 @bp.route('/groups')
 @login_required
 def groups():
@@ -190,7 +167,6 @@ def groups():
                            title="Groups",
                            user=g.user,
                            group_list=g.user.groups)
-
 
 @bp.route('/matcher')
 @login_required
@@ -207,7 +183,6 @@ def matcher():
                            user=g.user,
                            movie=movie)
 
-
 @bp.route('/clear_movies')
 @login_required
 def clear_movies():
@@ -221,7 +196,6 @@ def clear_movies():
 
     return json.dumps({'status': 'OK'})
 
-
 @bp.route('/next_movie')
 @login_required
 def next_movie():
@@ -233,7 +207,6 @@ def next_movie():
     num_movies = Movie.query.count()
 
     return json.dumps({'status': 'OK'})
-
 
 @bp.route('/clear_movies')
 @login_required
@@ -250,19 +223,12 @@ def matcher():
 @bp.route('/movies')
 @login_required
 def movies():
-
     # Not logged in
-
     if g.user == None:
-
         errorLogger.error('Failed to load movies - not logged in')
-
         abort(401)
 
     return render_template("main/movies.html",
-
                            title="Your Movies",
-
                            user=g.user,
-
                            movie_list=g.user.movies)
