@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Mon Sep 27 14:07:20 2021
+Created on Mon Dec 13 22:50:10 2021
 
 @author: sc20nk
 """
@@ -17,13 +17,18 @@ import json
 from werkzeug.exceptions import abort
 from app.auth import login_required
 
-bp = Blueprint('app', __name__)
+bp = Blueprint('groups', __name__)
 
 
-@bp.route('/')
-def index():
-    # Customise index if signed in
-    signed_in = g.user is not None
-    return render_template("index.html",
-                           title="Home",
-                           user=g.user)
+@bp.route('/groups')
+@login_required
+def groups():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Failed to load movies - not logged in')
+        abort(401)
+
+    return render_template("main/groups.html",
+                           title="Groups",
+                           user=g.user,
+                           group_list=g.user.groups)

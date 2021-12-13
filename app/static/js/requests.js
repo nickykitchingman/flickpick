@@ -238,12 +238,13 @@ $(document).ready(function () {
 					var R = decToHex(255 - Math.max(thisVal - 255, 0));
 					var G = decToHex(Math.min(thisVal, 255));
 					var B = decToHex(0);
+					var percentMatch = parseInt(match.strength / response.maxStrength * 100);
 					$("#matches").append(
 						`<li class="list-group-item" 
 						style="background-color:#${R}${G}${B};"><h2>
 						${match.name}</h2><p>
-						${match.releasedate}</p><div class="float-right numberCircle">
-						${match.strength}</div></li>`
+						${match.releasedate}</p><div class="float-right font-weight-bold">
+						${percentMatch}%</div></li>`
 					);
 				});
 			},

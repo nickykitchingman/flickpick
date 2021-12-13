@@ -3,14 +3,15 @@
 }
 
 .numberCircle {
-    border-radius: 50%;
+    border-radius: 35%;
     behavior: url(PIE.htc); /* remove if you don't care about IE8 */
-    width: 30px;
+    width: 60px;
     height: 30px;
     background: #fff;
     border: 2px solid black;
+    padding: 4px;
     color: black;
     text-align: center;
-    font: 24px Arial, sans-serif;
+    font: 18px Arial, sans-serif;
     display: inline-block;
 }
