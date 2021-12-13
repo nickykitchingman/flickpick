@@ -17,12 +17,26 @@
                 <div class="col-10 m-3 p-1 border">
                     <div class="col-12">
                         <div class="row p-4">
-                            <!-- Movie list -->
+                            <!-- Movie list yes -->
                             <ul class="col-11 list-unstyled">
-                                {% for movie in movie_list %}
+                                <div>Yes</div>
+                                {% for movie in movies_yes %}
                                 <li class="row m-2">
                                     <div class="col-md-10 border">
-                                        <p>{{movie.name}} ({{movie.releasedate.year}})</p>
+                                        <p>{{movie.name}}
+                                            ({{movie.releasedate.year}})</p>
+                                    </div>
+                                </li>
+                                {% endfor %}
+                            </ul>
+                            <!-- Movie list maybe -->
+                            <ul class="col-11 list-unstyled">
+                                <div>Maybe</div>
+                                {% for movie in movies_maybe %}
+                                <li class="row m-2">
+                                    <div class="col-md-10 border">
+                                        <p>{{movie.name}}
+                                            ({{movie.releasedate.year}})</p>
                                     </div>
                                 </li>
                                 {% endfor %}

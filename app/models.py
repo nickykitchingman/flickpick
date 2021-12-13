@@ -1,38 +1,30 @@
-from app import db, errorLogger
+from app import db, errorLogger, traceLogger
 
 from werkzeug.security import generate_password_hash
 
-from flask_security import UserMixin, RoleMixin
 from datetime import datetime
+import random
 
-
-movie_choice = db.Table('movie_choice', db.Model.metadata,
-                        db.Column('userId', db.Integer,
-                                  db.ForeignKey('user.userId')),
-                        db.Column('movieId', db.Integer,
-                                  db.ForeignKey('movie.movieId')),
-                        db.Column('strength', db.Integer, index=True)
-                        )
 
 stream = db.Table('stream', db.Model.metadata,
                   db.Column('movieId', db.Integer,
-                            db.ForeignKey('movie.movieId')),
+                            db.ForeignKey('movie.movieId'), primary_key=True),
                   db.Column('streamSiteId', db.Integer,
-                            db.ForeignKey('stream_site.streamSiteId'))
+                            db.ForeignKey('stream_site.streamSiteId'), primary_key=True)
                   )
 
 user_site = db.Table('user_site', db.Model.metadata,
                      db.Column('userId', db.Integer,
-                               db.ForeignKey('user.userId')),
+                               db.ForeignKey('user.userId'), primary_key=True),
                      db.Column('streamSiteId', db.Integer,
-                               db.ForeignKey('stream_site.streamSiteId'))
+                               db.ForeignKey('stream_site.streamSiteId'), primary_key=True)
                      )
 
 in_group = db.Table('in_group', db.Model.metadata,
                     db.Column('userId', db.Integer,
-                              db.ForeignKey('user.userId')),
+                              db.ForeignKey('user.userId'), primary_key=True),
                     db.Column('groupId', db.Integer,
-                              db.ForeignKey('group.groupId'))
+                              db.ForeignKey('group.groupId'), primary_key=True)
                     )
 
 friendship = db.Table('friend', db.Model.metadata,
@@ -57,9 +49,23 @@ friend_request = db.Table('request', db.Model.metadata,
 
 user_role = db.Table(
     'user_role',
-    db.Column('user_id', db.Integer, db.ForeignKey('user.userId')),
-    db.Column('role_id', db.Integer, db.ForeignKey('role.roleId'))
+    db.Column('user_id', db.Integer, db.ForeignKey(
+        'user.userId'), primary_key=True),
+    db.Column('role_id', db.Integer, db.ForeignKey(
+        'role.roleId'), primary_key=True)
 )
+
+
+class MovieChoice(db.Model):
+    userId = db.Column(db.Integer,
+                       db.ForeignKey('user.userId'), primary_key=True)
+    movieId = db.Column(db.Integer,
+                        db.ForeignKey('movie.movieId'), primary_key=True)
+    strength = db.Column(db.Integer, index=True)
+
+    def __repr__(self):
+        return f"{self.userId}-{self.movieId}: {self.strength}"
+
 
 class User(db.Model):
     userId = db.Column(db.Integer, primary_key=True)
@@ -77,14 +83,14 @@ class User(db.Model):
     requests = db.relationship('User', secondary=friend_request,
                                primaryjoin=userId == friend_request.c.userId,
                                secondaryjoin=userId == friend_request.c.friendId)
-    movies = db.relationship('Movie', secondary=movie_choice,
-                             backref=db.backref('user', lazy='joined'))
+    moviechoices = db.relationship('Movie', secondary="movie_choice",
+                                   backref=db.backref('users', lazy='joined'))
     streamSites = db.relationship("StreamSite", secondary=user_site,
-                                  backref=db.backref('user', lazy='joined'))
+                                  backref=db.backref('users', lazy='joined'))
     groups = db.relationship('Group', secondary=in_group,
-                             backref=db.backref('user', lazy='joined'))
+                             backref=db.backref('users', lazy='joined'))
     roles = db.relationship('Role', secondary=user_role,
-                            backref=db.backref('user', lazy='dynamic'))
+                            backref=db.backref('users', lazy='dynamic'))
 
     # Hash password instead of saving plaintext
     def set_password(self, password):
@@ -121,6 +127,7 @@ class Role(db.Model):
     def __repr__(self):
         return f"{self.name}: {self.description}"
 
+
 class Movie(db.Model):
     movieId = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
@@ -128,8 +135,21 @@ class Movie(db.Model):
     streamSites = db.relationship("StreamSite", secondary=stream,
                                   backref=db.backref('movie', lazy='joined'))
 
+    # Return a random movie
+    def get_random(user_id):
+        #query = Movie.query
+        traceLogger.debug(f'Random: user ({user_id})')
+        query = db.session.query(
+            Movie).filter(~Movie.users.any(userId=user_id))
+        num_movies = int(query.count())
+        return query.offset(int(num_movies*random.random())).first()
+
+    def as_dict(self):
+        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+
     def __repr__(self):
         return '{}{}{}'.format(self.movieId, self.name, self.releasedate)
+
 
 class StreamSite(db.Model):
     streamSiteId = db.Column(db.Integer, primary_key=True)
@@ -137,6 +157,7 @@ class StreamSite(db.Model):
 
     def __repr__(self):
         return '{}{}'.format(self.streamSiteId, self.name)
+
 
 class Group(db.Model):
     groupId = db.Column(db.Integer, primary_key=True)

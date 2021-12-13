@@ -23,14 +23,17 @@
                     <!-- Movie Pick -->
                     <div class="col-11">
                         <div class="col-md-10 border">
-                            <p>{{movie.name}}</p>
+                            <div id="movie-name">Name</div>
+                            <div id="movie-date">Date</div>
                         </div>
                         <!-- Options -->
                         <div>
                             <div class="col-1"></div>
-                            <a class="col-md-2 btn btn-primary" href="#">Yes</a>
-                            <a class="col-md-2 btn btn-warning" href="#">Maybe</a>
-                            <a class="col-md-2 btn btn-danger" href="#">No</a>
+                            <a id="yes" class="decision col-md-2 btn
+                                btn-primary">Yes</a>
+                            <a id="maybe" class="decision col-md-2 btn
+                                btn-warning">Maybe</a>
+                            <a id="no" class="decision col-md-2 btn btn-danger">No</a>
                             <div class="col-md-1"></div>
                         </div>
                     </div>

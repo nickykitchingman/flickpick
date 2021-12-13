@@ -1,7 +1,8 @@
 $(document).ready(function () {
 	if (!$.curCSS) $.curCSS = $.css;
 
-	var friend_suggestions = []
+	var friendSuggestions = []
+	var currentMovieId = -1;
 
 	// Set CSRF token to start of every request
 	var csrf_token = $('meta[name=csrf-token]').attr('content')
@@ -19,7 +20,7 @@ $(document).ready(function () {
 
 		if (username == "") {
 			$("#friend_suggestions").empty();
-			friend_suggestions.length = 0;
+			friendSuggestions.length = 0;
 		}
 		else {
 			$.ajax({
@@ -34,11 +35,11 @@ $(document).ready(function () {
 					if (username != "") {
 						// Autocomplete suggestions for usernames
 						$('#friend_suggestions').empty();
-						friend_suggestions.length = 0;
+						friendSuggestions.length = 0;
 						var i = 0;
 						response.forEach(function (user) {
 							suggestion = user['username']
-							friend_suggestions.push(user);
+							friendSuggestions.push(user);
 							$('#friend_suggestions').append('<li><a id="suggestion' + i +
 								'" class="suggestion btn btn-secondary">' + suggestion + '</a></li>')
 							i++;
@@ -46,7 +47,7 @@ $(document).ready(function () {
 					}
 				},
 				error: function (error) {
-					console.log("Error " + error);
+					console.log("Error " + error.responseText);
 				}
 			});
 		}
@@ -55,7 +56,7 @@ $(document).ready(function () {
 	// Send friend request
 	$(document).on('click', '.suggestion', function () {
 		var friendId = parseInt($(this).attr('id').replace('suggestion', ''));
-		var user = friend_suggestions[friendId];
+		var user = friendSuggestions[friendId];
 
 		$.ajax({
 			url: '/friend_request',
@@ -68,7 +69,7 @@ $(document).ready(function () {
 				$('#suggestion' + friendId).hide();
 			},
 			error: function (error) {
-				console.log('Error: ' + error);
+				console.log('Error: ' + error.responseText);
 			}
 		});
 	});
@@ -88,7 +89,7 @@ $(document).ready(function () {
 				$('#request' + userId).hide();
 			},
 			error: function (error) {
-				console.log('Error: ' + error);
+				console.log('Error: ' + error.responseText);
 			}
 		});
 	});
@@ -108,25 +109,103 @@ $(document).ready(function () {
 				$('#request' + userId).hide();
 			},
 			error: function (error) {
-				console.log('Error: ' + error);
+				console.log('Error: ' + error.responseText);
 			}
 		});
 	});
+
+	// Set next movie in movie picker
+	function nextMovie(funcAfter = null) {
+		$.get("/next_movie", function (response) {
+			if (response.movie == null) {
+				finishPicker();
+				return;
+			}
+
+			// Set first movie in picker
+			$("#movie-name").text(response.movie.name);
+			$("#movie-date").text(response.movie.releasedate);
+			currentMovieId = response.movie.movieId;
+
+			// Enable buttons
+			$("#yes").removeClass("disabled");
+			$("#maybe").removeClass("disabled");
+			$("#no").removeClass("disabled");
+
+			// Optionally return to other func
+			if (funcAfter != null)
+				funcAfter();
+		});
+	}
+
+	function swapToPicker() {
+		// Enable buttons
+		$("#yes").removeClass("disabled");
+		$("#maybe").removeClass("disabled");
+		$("#no").removeClass("disabled");
+
+		$("#movie-picker-btn").hide();
+		$("#movie-picker").show();
+	}
+
+	function finishPicker() {
+		$("#movie-picker").hide();
+		$("#movie-picker-btn").show();
+	}
 
 	// Initially hide movie picker
 	$("#movie-picker").hide().removeClass("d-none");
 	// Swap movie picker button for movie picker
 	$("#movie-picker-btn").click(function () {
-		// Clear movie choices
+		// Disable buttons
+		$("#yes").addClass("disabled");
+		$("#maybe").addClass("disabled");
+		$("#no").addClass("disabled");
+
+		// Clear movie choices and swap
 		$.get("/clear_movies");
+		nextMovie(swapToPicker);
+	});
 
-		// Get first movie
-		$.get("/next_movie", function (response) {
-			console.log(response.movie);
-		});
+	// Make decision on movie
+	$(".decision").click(function () {
+		var strDecision = $(this).attr("id");
+		var decision = -1;
 
-		// Swap to choice screen
-		$(this).hide();
-		$("#movie-picker").show();
+		// Decision to number for ease
+		switch (strDecision) {
+			case "yes": decision = "2"; break;
+			case "maybe": decision = "1"; break;
+			case "no": decision = "0"; break;
+		}
+
+		// Disable buttons
+		$("#yes").addClass("disabled");
+		$("#maybe").addClass("disabled");
+		$("#no").addClass("disabled");
+
+		// Send decision to server
+		if (decision != -1 && currentMovieId != -1) {
+			$.ajax({
+				url: '/add_movie',
+				type: 'POST',
+				data: JSON.stringify({ movieId: currentMovieId, decision: decision }),
+				contentType: 'application/json; charset=utf-8',
+				datatype: 'json',
+
+				// Change movie picker
+				success: function (response) {
+					nextMovie();
+				},
+				error: function (error) {
+					console.log('Error: ' + error.responseText);
+				}
+			});
+		}
+		// Invalid decision
+		else if (decision != -1)
+			console.log("Error - Invalid 'decision' class clicked");
+		else
+			console.log("Error - Invalid current movie id");
 	});
 });

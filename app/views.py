@@ -9,13 +9,14 @@ Created on Mon Sep 27 14:07:20 2021
 from flask import Blueprint, render_template, flash, redirect, g, request, url_for, session, jsonify
 from app import app, db, models, admin, errorLogger, traceLogger
 from .forms import RegisterForm
-from .models import User, Movie, StreamSite, Group, friend_request
+from .models import User, Movie, StreamSite, Group, friend_request, MovieChoice
 import json
 
 from werkzeug.exceptions import abort
 from app.auth import login_required
 
 bp = Blueprint('app', __name__)
+
 
 @bp.route('/')
 def index():
@@ -24,6 +25,7 @@ def index():
     return render_template("index.html",
                            title="Home",
                            user=g.user)
+
 
 @bp.route('/friends')
 @login_required
@@ -37,7 +39,7 @@ def friends():
     requests = db.session.query(friend_request.c.friendId, friend_request.c.date).filter(
         friend_request.c.userId == g.user.userId).all()
     requests_list = [{'friend': User.query.get(
-        req.friendId), 'data': req.date} for req in requests]
+        req.friendId), 'date': req.date} for req in requests]
 
     return render_template("main/friends.html",
                            title="Friends",
@@ -69,6 +71,7 @@ def users_like():
     user_dicts = [user.as_dict() for user in users]
 
     return jsonify(user_dicts)
+
 
 @bp.route('/friend_request', methods=['POST'])
 @login_required
@@ -128,6 +131,7 @@ def request_accept():
 
     return json.dumps({'status': 'OK'})
 
+
 @bp.route('/request_decline', methods=['POST'])
 @login_required
 def request_decline():
@@ -155,6 +159,7 @@ def request_decline():
 
     return json.dumps({'status': 'OK'})
 
+
 @bp.route('/groups')
 @login_required
 def groups():
@@ -167,6 +172,7 @@ def groups():
                            title="Groups",
                            user=g.user,
                            group_list=g.user.groups)
+
 
 @bp.route('/matcher')
 @login_required
@@ -183,6 +189,7 @@ def matcher():
                            user=g.user,
                            movie=movie)
 
+
 @bp.route('/clear_movies')
 @login_required
 def clear_movies():
@@ -191,10 +198,11 @@ def clear_movies():
         errorLogger.error('Failed to clear_movies - not logged in')
         abort(401)
 
-    g.user.movies.empty()
+    g.user.moviechoices.clear()
     db.session.commit()
 
     return json.dumps({'status': 'OK'})
+
 
 @bp.route('/next_movie')
 @login_required
@@ -204,20 +212,66 @@ def next_movie():
         errorLogger.error('Failed to get next_movie - not logged in')
         abort(401)
 
-    num_movies = Movie.query.count()
+    # Get random movie user has not already chosen
+    while True:
+        # No movies
+        if Movie.query.count() < 1:
+            movie = None
+            break
 
-    return json.dumps({'status': 'OK'})
+        movie = Movie.get_random(g.user.userId)
+        if movie not in g.user.moviechoices:
+            break
 
-@bp.route('/clear_movies')
+    # Run out
+    if movie is None:
+        return jsonify({'movie': None})
+
+    # Convert to useful form for the html
+    movie_dict = movie.as_dict()
+    movie_dict['releasedate'] = movie.releasedate.strftime('%b %d %Y')
+
+    return jsonify({'movie': movie_dict})
+
+
+@bp.route('/add_movie', methods=['POST'])
 @login_required
-def matcher():
+def add_movie():
     # Not logged in
     if g.user == None:
-        errorLogger.error('Failed to clear_movies - not logged in')
+        errorLogger.error('Failed to add_movie - not logged in')
         abort(401)
 
-    g.user.movies.empty()
+    # Load JSON data
+    data = json.loads(request.data)
+    movie_id = data.get('movieId')
+    decision = data.get('decision')
+    movie = Movie.query.get(movie_id)
+
+    traceLogger.debug(
+        f"User ({g.user.userId}) decided {decision} on movie {movie_id}")
+
+    # Invalid decision
+    if decision not in ['0', '1', '2']:
+        errorLogger.error(
+            f'Failed to add movie - decision not valid {decision}')
+        abort(403)
+
+    # Invalid movie
+    if movie is None:
+        errorLogger.error(
+            f'Failed to add movie - movie id not valid {movie_id}')
+        abort(403)
+
+    # Make decision on movie
+    if movie not in g.user.moviechoices:
+        g.user.moviechoices.append(movie)
+    choice = MovieChoice.query.filter_by(
+        userId=g.user.userId, movieId=movie_id).first()
+    choice.strength = int(decision)
     db.session.commit()
+
+    return json.dumps({'status': 'OK'})
 
 
 @bp.route('/movies')
@@ -228,7 +282,16 @@ def movies():
         errorLogger.error('Failed to load movies - not logged in')
         abort(401)
 
+    movies_yes = Movie.query.join(
+        MovieChoice, User).filter(User.userId == g.user.userId,
+                                  Movie.movieId == MovieChoice.movieId,
+                                  MovieChoice.strength == 2)
+    movies_maybe = Movie.query.join(
+        MovieChoice, User).filter(User.userId == g.user.userId,
+                                  Movie.movieId == MovieChoice.movieId,
+                                  MovieChoice.strength == 1)
     return render_template("main/movies.html",
                            title="Your Movies",
                            user=g.user,
-                           movie_list=g.user.movies)
+                           movies_yes=movies_yes,
+                           movies_maybe=movies_maybe)
