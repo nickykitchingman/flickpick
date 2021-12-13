@@ -150,8 +150,7 @@ class Movie(db.Model):
     def as_dict(self):
         return {"movieId": self.movieId,
                 "name": self.name,
-                "releasedate": self.niceDate(),
-                "streamSites": self.streamSites}
+                "releasedate": self.niceDate()}
 
     def __repr__(self):
         return '{}{}{}'.format(self.movieId, self.name, self.releasedate)
