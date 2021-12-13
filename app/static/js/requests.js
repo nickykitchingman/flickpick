@@ -41,7 +41,7 @@ $(document).ready(function () {
 							suggestion = user['username']
 							friendSuggestions.push(user);
 							$('#friend_suggestions').append('<li><a id="suggestion' + i +
-								'" class="suggestion btn btn-secondary">' + suggestion + '</a></li>')
+								'" class="suggestion btn btn-secondary">' + suggestion + '</a></li>');
 							i++;
 						});
 					}
@@ -207,5 +207,49 @@ $(document).ready(function () {
 			console.log("Error - Invalid 'decision' class clicked");
 		else
 			console.log("Error - Invalid current movie id");
+	});
+
+	function decToHex(rgb) {
+		var hex = parseInt(rgb).toString(16);
+		if (hex.length < 2) {
+			hex = "0" + hex;
+		}
+		return hex;
+	};
+
+	// Match movies with friend
+	$(".friend").click(function () {
+		var friendId = $(this).attr("id").replace("friend", "");
+
+		$.ajax({
+			url: '/match_friend',
+			type: 'POST',
+			data: JSON.stringify({ friendId: friendId }),
+			contentType: 'application/json; charset=utf-8',
+			datatype: 'json',
+
+			// Change movie picker
+			success: function (response) {
+				$("#matches").empty();
+				var val = 2 * 255 / response.maxStrength;
+
+				response.matches.forEach(function (match) {
+					var thisVal = match.strength * val;
+					var R = decToHex(255 - Math.max(thisVal - 255, 0));
+					var G = decToHex(Math.min(thisVal, 255));
+					var B = decToHex(0);
+					$("#matches").append(
+						`<li class="list-group-item" 
+						style="background-color:#${R}${G}${B};"><h2>
+						${match.name}</h2><p>
+						${match.releasedate}</p><div class="float-right numberCircle">
+						${match.strength}</div></li>`
+					);
+				});
+			},
+			error: function (error) {
+				console.log('Error: ' + error.responseText);
+			}
+		});
 	});
 });

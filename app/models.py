@@ -144,8 +144,14 @@ class Movie(db.Model):
         num_movies = int(query.count())
         return query.offset(int(num_movies*random.random())).first()
 
+    def niceDate(self):
+        return self.releasedate.strftime('%b %d %Y')
+
     def as_dict(self):
-        return {c.name: getattr(self, c.name) for c in self.__table__.columns}
+        return {"movieId": self.movieId,
+                "name": self.name,
+                "releasedate": self.niceDate(),
+                "streamSites": self.streamSites}
 
     def __repr__(self):
         return '{}{}{}'.format(self.movieId, self.name, self.releasedate)

@@ -7,9 +7,11 @@ Created on Mon Sep 27 14:07:20 2021
 """
 
 from flask import Blueprint, render_template, flash, redirect, g, request, url_for, session, jsonify
-from app import app, db, models, admin, errorLogger, traceLogger
+from app import app, db, models, admin, errorLogger, traceLogger, criticalLogger
 from .forms import RegisterForm
 from .models import User, Movie, StreamSite, Group, friend_request, MovieChoice
+from sqlalchemy import desc
+from sqlalchemy.orm import aliased
 import json
 
 from werkzeug.exceptions import abort
@@ -282,10 +284,12 @@ def movies():
         errorLogger.error('Failed to load movies - not logged in')
         abort(401)
 
+    # Chosen movies with strength 2 (yes)
     movies_yes = Movie.query.join(
         MovieChoice, User).filter(User.userId == g.user.userId,
                                   Movie.movieId == MovieChoice.movieId,
                                   MovieChoice.strength == 2)
+    # Chosen movies with strength 1 (maybe)
     movies_maybe = Movie.query.join(
         MovieChoice, User).filter(User.userId == g.user.userId,
                                   Movie.movieId == MovieChoice.movieId,
@@ -295,3 +299,53 @@ def movies():
                            user=g.user,
                            movies_yes=movies_yes,
                            movies_maybe=movies_maybe)
+
+
+def matchToDict(match):
+    match_dict = match.Movie.as_dict()
+    match_dict['strength'] = match[1] + match[2]
+    return match_dict
+
+
+@bp.route('/match_friend', methods=['POST'])
+@login_required
+def match_friend():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Failed to get next_movie - not logged in')
+        abort(401)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    friend_id = data.get('friendId')
+    friend = User.query.get(friend_id)
+
+    # Invalid movie
+    if friend is None:
+        errorLogger.error(
+            f'Failed to match friend - friend id not valid {movie_id}')
+        abort(403)
+
+    traceLogger.debug(
+        f"User ({g.user.userId}) matched with {friend_id}")
+
+    # Movie match by strengths adding to 4 (both said yes)
+    # try:
+    FriendMovieChoice = aliased(MovieChoice)
+    matches = db.session.query(Movie, MovieChoice.strength, FriendMovieChoice.strength)\
+        .join(MovieChoice, Movie.movieId == MovieChoice.movieId)\
+        .join(FriendMovieChoice, Movie.movieId == FriendMovieChoice.movieId)\
+        .filter(MovieChoice.userId == g.user.userId,
+                FriendMovieChoice.userId == friend.userId,
+                MovieChoice.strength + FriendMovieChoice.strength > 0)\
+        .order_by(desc(MovieChoice.strength + FriendMovieChoice.strength)).all()
+    # Critical db error
+    # except SQLAlchemyError as e:
+    #     error = str(e.__dict__['orig'])
+    #     criticalLogger.critical(error)
+    #     abort(500)
+
+    max_strength = 4
+
+    return jsonify({'matches': [matchToDict(match) for match in matches],
+                    'maxStrength': max_strength})

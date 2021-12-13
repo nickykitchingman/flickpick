@@ -18,22 +18,17 @@
                     <div class="col-12">
                         <div class="row p-4">
                             <!-- Friend list -->
-                            <ul class="col-11 list-unstyled">
+                            <ul class="col-11 list-group">
                                 {% for friend in friend_list %}
-                                <div class="friend">
+                                <div id="friend{{friend.userId}}"
+                                    class="friend list-group-item
+                                    list-group-item-action">
                                     <li class="row m-2">
-                                        <div class="col-md-10 border">
-                                            <p>{{friend.forename}}
-                                                {{friend.surname}}</p>
+                                        <div class="col-md-10">
+                                            <h3>{{friend.forename}}
+                                                {{friend.surname}}</h3>
                                         </div>
                                     </li>
-                                    <!-- Match on hover -->
-                                    <div class="row hiddenpanel d-none">
-                                        <div class="col-1"></div>
-                                        <a class="col-md-8 btn btn-primary"
-                                            href="#">Match</a>
-                                        <div class="col-md-1"></div>
-                                    </div>
                                 </div>
                                 {% endfor %}
                             </ul>
@@ -80,11 +75,11 @@
                                     <!-- Suggestions will be put here using jquery in requests.js -->
                                 </ul>
                             </div>
-                            <ul class="row p-4 list-unstyled">
+                            <ul class="row p-4 list-group">
                                 <!-- Request list -->
                                 {% for request in requests %}
                                 <li id="request{{request['friend'].userId}}"
-                                    class='col-md-12 border'>
+                                    class='col-md-12 border list-group-item'>
                                     <div class="btn">{{request['friend'].forename}}
                                         {{request['friend'].surname}}</div>
                                     <div class="accept btn btn-primary
