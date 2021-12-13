@@ -208,6 +208,45 @@ def matcher():
                            movie=movie)
 
 
+@bp.route('/clear_movies')
+@login_required
+def clear_movies():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Failed to clear_movies - not logged in')
+        abort(401)
+
+    g.user.movies.empty()
+    db.session.commit()
+
+    return json.dumps({'status': 'OK'})
+
+
+@bp.route('/next_movie')
+@login_required
+def next_movie():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Failed to get next_movie - not logged in')
+        abort(401)
+
+    num_movies = Movie.query.count()
+
+    return json.dumps({'status': 'OK'})
+
+
+@bp.route('/clear_movies')
+@login_required
+def matcher():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Failed to clear_movies - not logged in')
+        abort(401)
+
+    g.user.movies.empty()
+    db.session.commit()
+
+
 @bp.route('/movies')
 @login_required
 def movies():

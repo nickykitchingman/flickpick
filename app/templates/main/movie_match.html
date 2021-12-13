@@ -11,12 +11,16 @@
         <div class="col-3"></div>
     </div>
 
-    <!-- Movie Matching container -->
+    <!-- Movie Picking container -->
     <div class="row m-3">
         <div class="col-10 m-3 p-1 border">
             <div class="col-12">
-                <div class="row p-4">
-                    <!-- Movie Match -->
+                <!-- Start movie list -->
+                <div id="movie-picker-btn" class="row p4">
+                    <a class="btn">Create your movie list</a>
+                </div>
+                <div id="movie-picker" class="row p-4 d-none">
+                    <!-- Movie Pick -->
                     <div class="col-11">
                         <div class="col-md-10 border">
                             <p>{{movie.name}}</p>

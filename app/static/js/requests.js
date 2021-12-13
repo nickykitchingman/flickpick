@@ -112,4 +112,21 @@ $(document).ready(function () {
 			}
 		});
 	});
+
+	// Initially hide movie picker
+	$("#movie-picker").hide().removeClass("d-none");
+	// Swap movie picker button for movie picker
+	$("#movie-picker-btn").click(function () {
+		// Clear movie choices
+		$.get("/clear_movies");
+
+		// Get first movie
+		$.get("/next_movie", function (response) {
+			console.log(response.movie);
+		});
+
+		// Swap to choice screen
+		$(this).hide();
+		$("#movie-picker").show();
+	});
 });
