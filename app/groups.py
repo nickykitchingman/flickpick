@@ -44,7 +44,7 @@ def create_group():
 
     # Load JSON data
     data = json.loads(request.data)
-    group_name = data.get('name')
+    group_name = data.get('input')
     traceLogger.debug(
         f'User ({g.user.userId}) requested to find create_group {group_name}')
 
@@ -55,6 +55,74 @@ def create_group():
     # Create group and add user to it
     new_group = Group(name=group_name)
     g.user.groups.append(new_group)
+    db.session.commit()
+
+    return json.dumps({'status': 'OK'})
+
+
+@bp.route('/add_to_group', methods=['POST'])
+@login_required
+def add_to_group():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Unauthorised add to group - not logged in')
+        abort(403)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    friend_name = data.get('input')
+    group_id = data.get('groupId')
+    friend = User.query.filter_by(username=friend_name).first()
+    group = Group.query.get(group_id)
+
+    # Check user exists
+    if friend is None:
+        return jsonify({'error': 'User does not exist'})
+    # Check is friend
+    if not g.user.has_friend(friend_name):
+        return jsonify({'error': 'Must be friends!'})
+    # Check not already in group
+    if friend.in_group_id(group_id):
+        return jsonify({'error': 'User already in group'})
+    # Check group exists
+    if group is None:
+        errorLogger.error(f"Cannot add to group {group_id} - does not exist")
+        abort(403)
+
+    traceLogger.debug(
+        f'User ({g.user.userId}) added {friend.userId} to group {group_id}')
+
+    # Add friend to group
+    group.members.append(friend)
+    db.session.commit()
+
+    return json.dumps({'status': 'OK'})
+
+
+@bp.route('/edit_group', methods=['POST'])
+@login_required
+def edit_group():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Unauthorised edit group - not logged in')
+        abort(403)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    group_name = data.get('input')
+    group_id = data.get('groupId')
+    group = Group.query.get(group_id)
+
+    # Check group exists
+    if group is None:
+        errorLogger.error(f"Cannot edit group {group_id} - does not exist")
+        abort(403)
+
+    traceLogger.debug(
+        f'User ({g.user.userId}) changed {group.groupId} name to {group_name}')
+
+    # Add friend to group
+    group.name = group_name
     db.session.commit()
 
     return json.dumps({'status': 'OK'})

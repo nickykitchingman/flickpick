@@ -1,4 +1,5 @@
 $(document).ready(function () {
+
     $(".friend").find(".hiddenpanel").removeClass("d-none").hide();
 
     // Show match option
@@ -12,7 +13,7 @@ $(document).ready(function () {
 
     // Initially hide search boxes
     $("#search_friend_container").hide().removeClass("d-none");
-    $("#name_group_container").hide().removeClass("d-none");
+    $("#input_container").hide().removeClass("d-none");
     // Swap add friend for search box
     $("#add_friend").click(function () {
         $(this).hide();
@@ -25,26 +26,15 @@ $(document).ready(function () {
         $("#search_friend").val("");
         $('#friend_suggestions').empty();
     });
-    // Swap create group for name box
-    $("#create_group").click(function () {
-        $(this).hide();
-        $("#name_group_container").show();
-    });
-    // Cancel name group
-    $("#create_group_cancel").click(function () {
-        $("#name_group_container").hide();
-        $("#create_group").show();
-        $("#name_group").val("");
-    });
 
-    // Disable create group submit when name is null
-    $("#name_group").on("input", function () {
-        var name = $("#name_group").val();
+    // Disable input box submit when input is null
+    $("#input_box").on("input", function () {
+        var input = $("#input_box").val();
 
-        if (name == "") {
-            $("#create_submit").addClass("disabled");
+        if (input == "") {
+            $("#input_submit").addClass("disabled");
         } else
-            $("#create_submit").removeClass("disabled");
+            $("#input_submit").removeClass("disabled");
     });
 
     // Group actions appear on hover

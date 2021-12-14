@@ -3,6 +3,9 @@ $(document).ready(function () {
 
 	var friendSuggestions = []
 	var currentMovieId = -1;
+	var submitURL = null;
+	var currentFocusButton = null;
+	var currentData = {}
 
 	// Set CSRF token to start of every request
 	var csrf_token = $('meta[name=csrf-token]').attr('content')
@@ -12,6 +15,54 @@ $(document).ready(function () {
 				xhr.setRequestHeader("X-CSRFToken", csrf_token);
 			}
 		}
+	});
+
+	// Customise input field to specific action 
+	function focusInput(buttonId, placeholder, submitText, url, data = {}) {
+		submitURL = url;
+		currentData = data;
+		$("#input_box").attr("placeholder", placeholder);
+		$("#input_submit").text(submitText);
+
+		// Show old button
+		if (currentFocusButton != buttonId) {
+			$(`#${buttonId}`).hide();
+			$(`#${currentFocusButton}`).show();
+		}
+
+		// Show and focus input box if not already
+		$("#input_container").show().focus();
+		currentFocusButton = buttonId;
+	}
+
+	// Hide input
+	$("#input_cancel").click(function () {
+		$(`#${currentFocusButton}`).show();
+		currentFocusButton = null;
+
+		$("#input_container").hide();
+		$("#input_box").val("");
+	});
+
+	// Focus create group
+	$("#create_group").click(function () {
+		focusInput("create_group", "Group's name", "Create", "/create_group");
+	});
+
+	// Focus add to group
+	$(".add").click(function () {
+		var id = $(this).attr("id");
+		var groupId = $(this).closest(".group").attr("id").replace("group", "");
+		data = { groupId: groupId };
+		focusInput(id, "Friend's username", "Add", "/add_to_group", data);
+	});
+
+	// Edit group
+	$(".edit").click(function () {
+		var id = $(this).attr("id");
+		var groupId = $(this).closest(".group").attr("id").replace("group", "");
+		data = { groupId: groupId };
+		focusInput(id, "Group name", "Change", "/edit_group", data);
 	});
 
 	// Start searching for users
@@ -224,7 +275,6 @@ $(document).ready(function () {
 		var val = 2 * 255 / response.maxStrength;
 
 		response.matches.forEach(function (match) {
-			console.log(match.strength);
 			var thisVal = match.strength * val;
 			var R = decToHex(255 - Math.max(thisVal - 255, 0));
 			var G = decToHex(Math.min(thisVal, 255));
@@ -262,7 +312,10 @@ $(document).ready(function () {
 	});
 
 	// Match movies with group
-	$(".group").click(function () {
+	$(".group").click(function (e) {
+		// if (e.target.hasClass("add") || e.target.hasClass("edit") || e.target.hasClass("leave"))
+		// 	return;
+
 		var groupId = $(this).attr("id").replace("group", "");
 
 		$.ajax({
@@ -274,7 +327,6 @@ $(document).ready(function () {
 
 			// Change movie picker
 			success: function (response) {
-				console.log(`max: ${response.maxStrength}`);
 				showMatches(response);
 			},
 			error: function (error) {
@@ -284,24 +336,28 @@ $(document).ready(function () {
 	});
 
 	// Submit create group
-	$("#create_submit").click(function () {
-		var name = $("#name_group").val();
+	$("#input_submit").click(function () {
+		var input = $("#input_box").val();
+		data = currentData;
+		data.input = input;
 
-		if (name != "") {
+		if (input != "") {
 			$.ajax({
-				url: '/create_group',
+				url: submitURL,
 				type: 'POST',
-				data: JSON.stringify({ name: name }),
+				data: JSON.stringify(data),
 				contentType: "application/json; charset=utf-8",
 				datatype: "json",
 
 				success: function (response) {
-					$("#create_group_error").text("");
+					console.log("Success");
+
+					$("#input_error").text("");
 					error = response.error
 
 					// Display error if exists
 					if (error)
-						$("#create_group_error").text(error);
+						$("#input_error").text(error);
 					else
 						window.location.reload();
 				},
@@ -321,7 +377,7 @@ $(document).ready(function () {
 		panel.addClass("disabled");
 		$(this).addClass("disabled");
 		panel.find(".edit").addClass("disabled");
-		panel.find(".invite").addClass("disabled");
+		panel.find(".add").addClass("disabled");
 
 		$.ajax({
 			url: '/leave_group',
@@ -338,7 +394,38 @@ $(document).ready(function () {
 				panel.removeClass("disabled");
 				$(this).removeClass("disabled");
 				panel.find(".edit").removeClass("disabled");
-				panel.find(".invite").removeClass("disabled");
+				panel.find(".add").removeClass("disabled");
+			}
+		});
+	});
+
+	// Add to group
+	$(".add_submit").click(function () {
+		var panel = $(this).closest("[id^=group]");
+		var groupId = panel.attr(("id")).replace("group", "");
+
+		// Disable buttons
+		panel.addClass("disabled");
+		$(this).addClass("disabled");
+		panel.find(".edit").addClass("disabled");
+		panel.find(".add").addClass("disabled");
+
+		$.ajax({
+			url: '/add_to_group',
+			type: 'POST',
+			data: JSON.stringify({ groupId: groupId }),
+			contentType: "application/json; charset=utf-8",
+			datatype: "json",
+
+			success: function (response) {
+				window.location.reload();
+			},
+			error: function (error) {
+				console.log("Error " + error.responseText);
+				panel.removeClass("disabled");
+				$(this).removeClass("disabled");
+				panel.find(".edit").removeClass("disabled");
+				panel.find(".add").removeClass("disabled");
 			}
 		});
 	});

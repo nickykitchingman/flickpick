@@ -16,18 +16,18 @@
             <div class="row">
                 <div class="col-1"></div>
                 <div class="col-10">
-                    <a class="btn btn-primary"
+                    <a class="btn btn-primary mb-3"
                         id="create_group" role="button">Create Group
                     </a>
                     <!-- Search friend box -->
-                    <div id="name_group_container" class="row d-none">
+                    <div id="input_container" class="row d-none">
                         <div class="col-12">
                             <div class="input-group row">
-                                <input id="name_group"
+                                <input id="input_box"
                                     class="form-control" type="text"
                                     placeholder="Groups's name">
                                 <!-- Cancel (including text for screen readers) -->
-                                <a id="create_group_cancel"
+                                <a id="input_cancel"
                                     class="input-group-append"
                                     aria-label="Close">
                                     <span class="input-group-text close
@@ -37,14 +37,14 @@
                             </div>
                             <!-- Submit create group -->
                             <div class="row">
-                                <a id="create_submit" class="col-3 btn
+                                <a id="input_submit" class="col-3 btn
                                     btn-primary
                                     form-control
                                     mt-3
                                     disabled"
                                     role="button">Create
                                 </a>
-                                <p id="create_group_error" class="col-9
+                                <p id="input_error" class="col-9
                                     text-danger text-center mt-3">
                                 </p>
                             </div>
@@ -66,7 +66,8 @@
                                     list-group-item-action">
                                     <li class="row m-2">
                                         <div class="col-md-12">
-                                            <h3 class="row">{{group.name}} </h3>
+                                            <h3 class="row group_name">{{group.name}}
+                                            </h3>
                                             <div class="row mt-3">
                                                 {% for member in group.members
                                                 %}
@@ -74,9 +75,10 @@
                                                 {% endfor %}
                                             </div>
                                             <div class="row mt-2 hover d-none">
-                                                <a class="col-2 btn
-                                                    btn-info m-2 invite">
-                                                    Invite
+                                                <a id="add{{loop.index}}"
+                                                    class="col-2 btn
+                                                    btn-info m-2 add">
+                                                    Add
                                                 </a>
                                                 <a class="col-2 btn
                                                     btn-warning m-2 edit">
