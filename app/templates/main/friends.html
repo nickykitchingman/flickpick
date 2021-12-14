@@ -52,52 +52,55 @@
                         <!-- Search box -->
                         <div class="row p-4">
                             <!-- Add friend button -->
-                            <a><type="button" class="btn btn-primary"
-                                    id="add_friend">Add Friend</a>
-                                <!-- Search friend box -->
-                                <div class="input-group mb-3">
-                                    <input id="search_friend"
-                                        class="form-control d-none" type="text"
-                                        placeholder="Friend's name">
-                                    <!-- Cancel (including text for screen readers) -->
-                                    <a id="search_friend_cancel"
-                                        class="input-group-append d-none"
-                                        aria-label="Close">
-                                        <span class="input-group-text close
-                                            danger" aria-hidden="true">&times;</span>
-                                    </a>
-                                </div>
+                            <a id="add_friend" class="btn btn-primary"
+                                role="button">Add Friend
+                            </a>
+                            <!-- Search friend box -->
+                            <div id="search_friend_container" class="input-group
+                                mb-3 d-none">
+                                <input id="search_friend"
+                                    class="form-control" type="text"
+                                    placeholder="Friend's name">
+                                <!-- Cancel (including text for screen readers) -->
+                                <a id="search_friend_cancel"
+                                    class="input-group-append"
+                                    aria-label="Close">
+                                    <span class="input-group-text close
+                                        danger" aria-hidden="true">&times;
+                                    </span>
+                                </a>
                             </div>
-                            <div class="row">
-                                <!-- Suggestions list -->
-                                <ul id="friend_suggestions" class="col-11
-                                    list-unstyled">
-                                    <!-- Suggestions will be put here using jquery in requests.js -->
-                                </ul>
-                            </div>
-                            <ul class="row p-4 list-group">
-                                <!-- Request list -->
-                                {% for request in requests %}
-                                <li id="request{{request['friend'].userId}}"
-                                    class='col-md-12 border list-group-item'>
-                                    <div class="btn">{{request['friend'].forename}}
-                                        {{request['friend'].surname}}</div>
-                                    <div class="accept btn btn-primary
-                                        float-right rounded-0">Accept</div>
-                                    <div class="decline btn btn-danger
-                                        float-right rounded-0">Decline</div>
-                                </li>
-                                {% endfor %}
+                        </div>
+                        <div class="row">
+                            <!-- Suggestions list -->
+                            <ul id="friend_suggestions" class="col-11
+                                list-unstyled">
+                                <!-- Suggestions will be put here using jquery in requests.js -->
                             </ul>
                         </div>
+                        <ul class="row p-4 list-group">
+                            <!-- Request list -->
+                            {% for request in requests %}
+                            <li id="request{{request['friend'].userId}}"
+                                class='col-md-12 border list-group-item'>
+                                <div class="btn">{{request['friend'].forename}}
+                                    {{request['friend'].surname}}</div>
+                                <div class="accept btn btn-primary
+                                    float-right rounded-0">Accept</div>
+                                <div class="decline btn btn-danger
+                                    float-right rounded-0">Decline</div>
+                            </li>
+                            {% endfor %}
+                        </ul>
                     </div>
                 </div>
             </div>
+        </div>
 
-            <!-- Matches -->
-            <div class="col-6">
-                {% include "main/matches.html" %}
-            </div>
+        <!-- Matches -->
+        <div class="col-6">
+            {% include "main/matches.html" %}
         </div>
     </div>
-    {% endblock %}
+</div>
+{% endblock %}

@@ -253,4 +253,33 @@ $(document).ready(function () {
 			}
 		});
 	});
+
+	// Submit create group
+	$("#create_submit").click(function () {
+		var name = $("#name_group").val();
+
+		if (name != "") {
+			$.ajax({
+				url: '/create_group',
+				type: 'POST',
+				data: JSON.stringify({ name: name }),
+				contentType: "application/json; charset=utf-8",
+				datatype: "json",
+
+				success: function (response) {
+					$("#create_group_error").text("");
+					error = response.error
+
+					// Display error if exists
+					if (error)
+						$("#create_group_error").text(error);
+					else
+						window.location.reload();
+				},
+				error: function (error) {
+					console.log("Error " + error.responseText);
+				}
+			});
+		}
+	});
 });

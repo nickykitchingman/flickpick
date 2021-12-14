@@ -12,26 +12,82 @@
                 <div class="col-3"></div>
             </div>
 
+            <!-- Add Group -->
+            <div class="row">
+                <div class="col-1"></div>
+                <div class="col-10">
+                    <a class="btn btn-primary"
+                        id="create_group" role="button">Create Group
+                    </a>
+                    <!-- Search friend box -->
+                    <div id="name_group_container" class="row d-none">
+                        <div class="col-12">
+                            <div class="input-group row">
+                                <input id="name_group"
+                                    class="form-control" type="text"
+                                    placeholder="Groups's name">
+                                <!-- Cancel (including text for screen readers) -->
+                                <a id="create_group_cancel"
+                                    class="input-group-append"
+                                    aria-label="Close">
+                                    <span class="input-group-text close
+                                        danger" aria-hidden="true">&times;
+                                    </span>
+                                </a>
+                            </div>
+                            <!-- Submit create group -->
+                            <div class="row">
+                                <a id="create_submit" class="col-3 btn
+                                    btn-primary
+                                    form-control
+                                    mt-3
+                                    disabled"
+                                    role="button">Create
+                                </a>
+                                <p id="create_group_error" class="col-9
+                                    text-danger text-center mt-3">
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <!-- Groups container -->
             <div class="row m-3">
-                <div class="col-10 m-3 p-1 border">
+                <div class="col-10 m-3 p-1">
                     <div class="col-12">
                         <div class="row p-4">
                             <!-- Groups list -->
-                            <ul class="col-11 list-unstyled">
+                            <ul class="col-11 list-group">
                                 {% for group in group_list %}
-                                <div class="friend">
+                                <div class="group list-group-item
+                                    list-group-item-action">
                                     <li class="row m-2">
-                                        <div class="col-md-10 border">
-                                            <p>{{group.name}}</p>
+                                        <div class="col-md-12">
+                                            <h3 class="row">{{group.name}} </h3>
+                                            <div class="row mt-3">
+                                                {% for member in group.members
+                                                %}
+                                                {{member.forename}}
+                                                {% endfor %}
+                                            </div>
+                                            <div class="row mt-2 hover d-none">
+                                                <a class="col-2 btn
+                                                    btn-info m-2">
+                                                    Invite
+                                                </a>
+                                                <a class="col-2 btn
+                                                    btn-warning m-2">
+                                                    Edit
+                                                </a>
+                                                <a class="col-2 btn
+                                                    btn-danger m-2">
+                                                    Leave
+                                                </a>
+                                            </div>
                                         </div>
                                     </li>
-                                    <!-- Match on hover -->
-                                    <div class="row hiddenpanel d-none">
-                                        <div class="col-1"></div>
-                                        <a class="col-md-8 btn btn-primary" href="#">Match</a>
-                                        <div class="col-md-1"></div>
-                                    </div>
                                 </div>
                                 {% endfor %}
                             </ul>

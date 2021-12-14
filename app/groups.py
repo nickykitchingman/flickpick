@@ -32,3 +32,29 @@ def groups():
                            title="Groups",
                            user=g.user,
                            group_list=g.user.groups)
+
+
+@bp.route('/create_group', methods=['POST'])
+@login_required
+def create_group():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Unauthorised create_group - not logged in')
+        abort(403)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    group_name = data.get('name')
+    traceLogger.debug(
+        f'User ({g.user.userId}) requested to find create_group %{group_name}%')
+
+    # Check doesn't already exist
+    if g.user.in_group(group_name):
+        return jsonify({'error': 'Group already exists'})
+
+    # Create group and add user to it
+    new_group = Group(name=group_name)
+    g.user.groups.append(new_group)
+    db.session.commit()
+
+    return json.dumps({'status': 'OK'})

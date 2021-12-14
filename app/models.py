@@ -88,7 +88,7 @@ class User(db.Model):
     streamSites = db.relationship("StreamSite", secondary=user_site,
                                   backref=db.backref('users', lazy='joined'))
     groups = db.relationship('Group', secondary=in_group,
-                             backref=db.backref('users', lazy='joined'))
+                             backref=db.backref('members', lazy='joined'))
     roles = db.relationship('Role', secondary=user_role,
                             backref=db.backref('users', lazy='dynamic'))
 
@@ -111,6 +111,10 @@ class User(db.Model):
         if role_object not in self.roles:
             self.roles.append(role_object)
             db.session.commit()
+
+    # Simpler role interface
+    def in_group(self, name):
+        return name in [group.name for group in self.groups]
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}
