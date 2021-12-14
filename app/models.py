@@ -112,9 +112,12 @@ class User(db.Model):
             self.roles.append(role_object)
             db.session.commit()
 
-    # Simpler role interface
     def in_group(self, name):
         return name in [group.name for group in self.groups]
+
+    def in_group_id(self, id):
+        traceLogger.debug(f"{id} {[group.groupId for group in self.groups]}")
+        return id in [str(group.groupId) for group in self.groups]
 
     def as_dict(self):
         return {c.name: getattr(self, c.name) for c in self.__table__.columns}

@@ -215,7 +215,30 @@ $(document).ready(function () {
 			hex = "0" + hex;
 		}
 		return hex;
-	};
+	}
+
+	// Show matches with friend or group, 
+	// assigning each a colour based on strength of match
+	function showMatches(response) {
+		$("#matches").empty();
+		var val = 2 * 255 / response.maxStrength;
+
+		response.matches.forEach(function (match) {
+			console.log(match.strength);
+			var thisVal = match.strength * val;
+			var R = decToHex(255 - Math.max(thisVal - 255, 0));
+			var G = decToHex(Math.min(thisVal, 255));
+			var B = decToHex(0);
+			var percentMatch = parseInt(match.strength / response.maxStrength * 100);
+			$("#matches").append(
+				`<li class="list-group-item" 
+						style="background-color:#${R}${G}${B};"><h2>
+						${match.name}</h2><p>
+						${match.releasedate}</p><div class="float-right font-weight-bold">
+						${percentMatch}%</div></li>`
+			);
+		});
+	}
 
 	// Match movies with friend
 	$(".friend").click(function () {
@@ -230,23 +253,29 @@ $(document).ready(function () {
 
 			// Change movie picker
 			success: function (response) {
-				$("#matches").empty();
-				var val = 2 * 255 / response.maxStrength;
+				showMatches(response);
+			},
+			error: function (error) {
+				console.log('Error: ' + error.responseText);
+			}
+		});
+	});
 
-				response.matches.forEach(function (match) {
-					var thisVal = match.strength * val;
-					var R = decToHex(255 - Math.max(thisVal - 255, 0));
-					var G = decToHex(Math.min(thisVal, 255));
-					var B = decToHex(0);
-					var percentMatch = parseInt(match.strength / response.maxStrength * 100);
-					$("#matches").append(
-						`<li class="list-group-item" 
-						style="background-color:#${R}${G}${B};"><h2>
-						${match.name}</h2><p>
-						${match.releasedate}</p><div class="float-right font-weight-bold">
-						${percentMatch}%</div></li>`
-					);
-				});
+	// Match movies with group
+	$(".group").click(function () {
+		var groupId = $(this).attr("id").replace("group", "");
+
+		$.ajax({
+			url: '/match_group',
+			type: 'POST',
+			data: JSON.stringify({ groupId: groupId }),
+			contentType: 'application/json; charset=utf-8',
+			datatype: 'json',
+
+			// Change movie picker
+			success: function (response) {
+				console.log(`max: ${response.maxStrength}`);
+				showMatches(response);
 			},
 			error: function (error) {
 				console.log('Error: ' + error.responseText);
@@ -281,5 +310,36 @@ $(document).ready(function () {
 				}
 			});
 		}
+	});
+
+	// Delete group
+	$(".leave").click(function () {
+		var panel = $(this).closest("[id^=group]");
+		var groupId = panel.attr(("id")).replace("group", "");
+
+		// Disable buttons
+		panel.addClass("disabled");
+		$(this).addClass("disabled");
+		panel.find(".edit").addClass("disabled");
+		panel.find(".invite").addClass("disabled");
+
+		$.ajax({
+			url: '/leave_group',
+			type: 'POST',
+			data: JSON.stringify({ groupId: groupId }),
+			contentType: "application/json; charset=utf-8",
+			datatype: "json",
+
+			success: function (response) {
+				window.location.reload();
+			},
+			error: function (error) {
+				console.log("Error " + error.responseText);
+				panel.removeClass("disabled");
+				$(this).removeClass("disabled");
+				panel.find(".edit").removeClass("disabled");
+				panel.find(".invite").removeClass("disabled");
+			}
+		});
 	});
 });

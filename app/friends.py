@@ -151,3 +151,52 @@ def request_decline():
     db.session.commit()
 
     return json.dumps({'status': 'OK'})
+
+
+def matchToDict(match):
+    match_dict = match.Movie.as_dict()
+    match_dict['strength'] = match[1] + match[2]
+    return match_dict
+
+
+@bp.route('/match_friend', methods=['POST'])
+@login_required
+def match_friend():
+    # Not logged in
+    if g.user == None:
+        errorLogger.error('Failed to match friend - not logged in')
+        abort(401)
+
+    # Load JSON data
+    data = json.loads(request.data)
+    friend_id = data.get('friendId')
+    friend = User.query.get(friend_id)
+    traceLogger.debug(
+        f"User ({g.user.userId}) matched with {friend_id}")
+
+    # Invalid movie
+    if friend is None:
+        errorLogger.error(
+            f'Failed to match friend - friend id not valid {friend_id}')
+        abort(403)
+
+    # Movie match by summing strengths
+    # try:
+    FriendMovieChoice = aliased(MovieChoice)
+    matches = db.session.query(Movie, MovieChoice.strength, FriendMovieChoice.strength)\
+        .join(MovieChoice, Movie.movieId == MovieChoice.movieId)\
+        .join(FriendMovieChoice, Movie.movieId == FriendMovieChoice.movieId)\
+        .filter(MovieChoice.userId == g.user.userId,
+                FriendMovieChoice.userId == friend.userId,
+                MovieChoice.strength + FriendMovieChoice.strength > 0)\
+        .order_by(desc(MovieChoice.strength + FriendMovieChoice.strength)).all()
+    # Critical db error
+    # except SQLAlchemyError as e:
+    #     error = str(e.__dict__['orig'])
+    #     criticalLogger.critical(error)
+    #     abort(500)
+
+    max_strength = 4
+
+    return jsonify({'matches': [matchToDict(match) for match in matches],
+                    'maxStrength': max_strength})

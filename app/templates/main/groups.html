@@ -61,7 +61,8 @@
                             <!-- Groups list -->
                             <ul class="col-11 list-group">
                                 {% for group in group_list %}
-                                <div class="group list-group-item
+                                <div id="group{{group.groupId}}" class="group
+                                    list-group-item
                                     list-group-item-action">
                                     <li class="row m-2">
                                         <div class="col-md-12">
@@ -74,15 +75,15 @@
                                             </div>
                                             <div class="row mt-2 hover d-none">
                                                 <a class="col-2 btn
-                                                    btn-info m-2">
+                                                    btn-info m-2 invite">
                                                     Invite
                                                 </a>
                                                 <a class="col-2 btn
-                                                    btn-warning m-2">
+                                                    btn-warning m-2 edit">
                                                     Edit
                                                 </a>
                                                 <a class="col-2 btn
-                                                    btn-danger m-2">
+                                                    btn-danger m-2 leave">
                                                     Leave
                                                 </a>
                                             </div>
