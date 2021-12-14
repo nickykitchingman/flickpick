@@ -33,7 +33,6 @@ accessLogger = logging.getLogger('access')
 errorLogger = logging.getLogger('warning')
 criticalLogger = logging.getLogger('critical')
 
-<<<<<<< HEAD
 # Models & views
 from app import views, models, auth, movies, friends, groups
 
@@ -42,14 +41,4 @@ app.register_blueprint(views.bp)
 app.register_blueprint(movies.bp)
 app.register_blueprint(friends.bp)
 app.register_blueprint(groups.bp)
-=======
-# Models & views (including auth views)
-from app import views, models, auth, friends, groups, movies
-
-app.register_blueprint(auth.bp)
-app.register_blueprint(views.bp)
-app.register_blueprint(friends.bp)
-app.register_blueprint(groups.bp)
-app.register_blueprint(movies.bp)
->>>>>>> develop
 app.add_url_rule('/', endpoint='index')
