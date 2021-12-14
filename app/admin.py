@@ -1,6 +1,6 @@
 from app import app, db, models, traceLogger, accessLogger
 from flask import Blueprint, url_for, session, g, redirect
-from .models import User, Movie, StreamSite, Group, Role, MovieChoice
+from .models import User, Movie, Group, Role, MovieChoice
 
 from flask_admin.contrib.sqla import ModelView
 from flask_admin.menu import MenuLink
@@ -54,7 +54,6 @@ adminView.add_link(MenuLink(name='Logout', url='/auth/logout'))
 
 adminView.add_view(MyModelView(User, db.session))
 adminView.add_view(MyModelView(Movie, db.session))
-adminView.add_view(MyModelView(StreamSite, db.session))
 adminView.add_view(MyModelView(Group, db.session))
 adminView.add_view(MyModelView(Role, db.session))
 adminView.add_view(MyModelView(MovieChoice, db.session))

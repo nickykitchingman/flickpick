@@ -5,21 +5,6 @@ from werkzeug.security import generate_password_hash
 from datetime import datetime
 import random
 
-
-stream = db.Table('stream', db.Model.metadata,
-                  db.Column('movieId', db.Integer,
-                            db.ForeignKey('movie.movieId'), primary_key=True),
-                  db.Column('streamSiteId', db.Integer,
-                            db.ForeignKey('stream_site.streamSiteId'), primary_key=True)
-                  )
-
-user_site = db.Table('user_site', db.Model.metadata,
-                     db.Column('userId', db.Integer,
-                               db.ForeignKey('user.userId'), primary_key=True),
-                     db.Column('streamSiteId', db.Integer,
-                               db.ForeignKey('stream_site.streamSiteId'), primary_key=True)
-                     )
-
 in_group = db.Table('in_group', db.Model.metadata,
                     db.Column('userId', db.Integer,
                               db.ForeignKey('user.userId'), primary_key=True),
@@ -85,8 +70,6 @@ class User(db.Model):
                                secondaryjoin=userId == friend_request.c.friendId)
     moviechoices = db.relationship('Movie', secondary="movie_choice",
                                    backref=db.backref('users', lazy='joined'))
-    streamSites = db.relationship("StreamSite", secondary=user_site,
-                                  backref=db.backref('users', lazy='joined'))
     groups = db.relationship('Group', secondary=in_group,
                              backref=db.backref('members', lazy='joined'))
     roles = db.relationship('Role', secondary=user_role,
@@ -141,8 +124,6 @@ class Movie(db.Model):
     movieId = db.Column(db.Integer, primary_key=True)
     name = db.Column(db.String(60))
     releasedate = db.Column(db.Date)
-    streamSites = db.relationship("StreamSite", secondary=stream,
-                                  backref=db.backref('movie', lazy='joined'))
 
     # Return a random movie
     def get_random(user_id):
@@ -163,14 +144,6 @@ class Movie(db.Model):
 
     def __repr__(self):
         return '{}{}{}'.format(self.movieId, self.name, self.releasedate)
-
-
-class StreamSite(db.Model):
-    streamSiteId = db.Column(db.Integer, primary_key=True)
-    name = db.Column(db.String(60))
-
-    def __repr__(self):
-        return '{}{}'.format(self.streamSiteId, self.name)
 
 
 class Group(db.Model):

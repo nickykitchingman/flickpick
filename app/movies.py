@@ -9,7 +9,7 @@ Created on Mon Dec 13 22:45:40 2021
 from flask import Blueprint, render_template, flash, redirect, g, request, url_for, session, jsonify
 from app import app, db, models, admin, errorLogger, traceLogger, criticalLogger
 from .forms import RegisterForm
-from .models import User, Movie, StreamSite, Group, friend_request, MovieChoice
+from .models import User, Movie, Group, friend_request, MovieChoice
 from sqlalchemy import desc
 from sqlalchemy.orm import aliased
 import json
