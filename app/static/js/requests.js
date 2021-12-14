@@ -31,7 +31,7 @@ $(document).ready(function () {
 		}
 
 		// Show and focus input box if not already
-		$("#input_container").show().focus();
+		$("#input_container").show().focus().get(0).scrollIntoView();
 		currentFocusButton = buttonId;
 	}
 
@@ -288,6 +288,9 @@ $(document).ready(function () {
 						${percentMatch}%</div></li>`
 			);
 		});
+		$([document.documentElement, document.body]).animate({
+			scrollTop: $("#match_top").offset().top
+		}, 1000);
 	}
 
 	// Match movies with friend
