@@ -1,13 +1,18 @@
 <ul class="navbar-nav mr-auto">
-  <li class="nav-item"><a class="nav-link {% block nav_movies %}{% endblock %}" href="{{ url_for('movies.matcher') }}">Matcher</a></li>
-  <li class="nav-item"><a class="nav-link {% block nav_matcher %}{% endblock %}" href="{{ url_for('movies.movies') }}">Movies</a></li>
-  <li class="nav-item"><a class="nav-link {% block nav_friends %}{% endblock %}" href="{{ url_for('friends.friends') }}">Friends</a></li>
-  <li class="nav-item"><a class="nav-link {% block nav_groups %}{% endblock %}" href="{{ url_for('groups.groups') }}">Groups</a></li>
+  <li class="nav-item"><a class="nav-link {% block nav_movies %}{% endblock %}"
+      href="{{ url_for('movies.matcher') }}">Matcher</a></li>
+  <li class="nav-item"><a class="nav-link {% block nav_matcher %}{% endblock %}"
+      href="{{ url_for('movies.movies') }}">Movies</a></li>
+  <li class="nav-item"><a class="nav-link {% block nav_friends %}{% endblock %}"
+      href="{{ url_for('friends.friends') }}">Friends</a></li>
+  <li class="nav-item"><a class="nav-link {% block nav_groups %}{% endblock %}"
+      href="{{ url_for('groups.groups') }}">Groups</a></li>
 </ul>
 
-<ul class="nav navbar-nav navbar-right">
+<ul class="nav navbar-nav">
   {% if user and user.has_role('superuser') %}
-  <li><a class="btn btn-dark mr-2" href="{{ url_for('admin.index') }}">Admin Site</a></li>
+  <li><a class="btn btn-dark my-1 mr-2" href="{{ url_for('admin.index') }}">Admin
+      Site</a></li>
   {% endif %}
-  <li><a class="btn btn-info" href="{{ url_for('auth.logout') }}">Log Out</a></li>
+  <li><a class="btn btn-info my-1" href="{{ url_for('auth.logout') }}">Log Out</a></li>
 </ul>
