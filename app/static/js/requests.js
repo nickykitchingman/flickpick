@@ -202,6 +202,7 @@ $(document).ready(function () {
 	function finishPicker() {
 		$("#movie-picker").hide();
 		$("#movie-picker-btn").show();
+		window.location.replace("/movies");
 	}
 
 	// Initially hide movie picker
