@@ -12,6 +12,7 @@ from .forms import RegisterForm
 from .models import User, Movie, Group, in_group, MovieChoice
 from sqlalchemy import desc
 from sqlalchemy.orm import aliased
+from sqlalchemy.sql import func
 import json
 
 from werkzeug.exceptions import abort
@@ -169,8 +170,6 @@ def leave_group():
 def matchToDict(match):
     match_dict = match.Movie.as_dict()
     strength = match[1]
-    if len(match) > 2:
-        strength += match[2]
     match_dict['strength'] = strength
     return match_dict
 
@@ -200,26 +199,18 @@ def match_group():
     max_strength = num_members * 2
 
     # Movie match by summing strengths
-    if (num_members > 1):
-        FriendMovieChoice = aliased(MovieChoice)
-        in_group_too = aliased(in_group)
-        matches = db.session.query(Movie, MovieChoice.strength, FriendMovieChoice.strength)\
-            .join(MovieChoice, Movie.movieId == MovieChoice.movieId)\
-            .join(FriendMovieChoice, Movie.movieId == FriendMovieChoice.movieId)\
-            .join(Group, Group.groupId == group_id)\
-            .filter(MovieChoice.userId == g.user.userId,
-                    in_group.c.groupId == in_group_too.c.groupId,
-                    in_group.c.userId == MovieChoice.userId,
-                    in_group_too.c.userId == FriendMovieChoice.userId,
-                    MovieChoice.userId != FriendMovieChoice.userId,
-                    MovieChoice.strength + FriendMovieChoice.strength > 0)\
-            .order_by(desc(MovieChoice.strength + FriendMovieChoice.strength)).all()
-    else:
-        matches = db.session.query(Movie, MovieChoice.strength)\
-            .join(MovieChoice, Movie.movieId == MovieChoice.movieId)\
-            .filter(MovieChoice.userId == g.user.userId,
-                    MovieChoice.strength > 0)\
-            .order_by(desc(MovieChoice.strength)).all()
+    matches = db.session.query(Movie, func.sum(
+        MovieChoice.strength).label('total_strength'))\
+        .join(MovieChoice, Movie.movieId == MovieChoice.movieId)\
+        .join(User, User.userId == MovieChoice.userId)\
+        .join(Group, Group.groupId == group_id)\
+        .filter(in_group.c.userId == User.userId,
+                in_group.c.groupId == Group.groupId,
+                MovieChoice.strength > 0)\
+        .group_by(Movie.movieId)\
+        .order_by(desc('total_strength')).all()
+
+    traceLogger.debug([f'{match[1]}/{max_strength}' for match in matches])
 
     return jsonify({'matches': [matchToDict(match) for match in matches],
                     'maxStrength': max_strength})
