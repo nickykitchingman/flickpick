@@ -208,6 +208,7 @@ def match_group():
             .join(FriendMovieChoice, Movie.movieId == FriendMovieChoice.movieId)\
             .join(Group, Group.groupId == group_id)\
             .filter(MovieChoice.userId == g.user.userId,
+                    in_group.c.groupId == in_group_too.c.groupId,
                     in_group.c.userId == MovieChoice.userId,
                     in_group_too.c.userId == FriendMovieChoice.userId,
                     MovieChoice.userId != FriendMovieChoice.userId,
